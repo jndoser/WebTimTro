@@ -1,0 +1,46 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-title">
+                    File upload by AJAX
+                </div>
+                <div class="card-body">
+                    <div id="upload-image">
+                        <input type="file" name="file" id="file" multiple/>
+                        <button class="btn btn-primary" onclick="uploadFiles()">
+                            Upload Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function uploadFiles() {
+  var input = document.getElementById('file');
+  var files = input.files;
+  var formData = new FormData();
+
+  for (var i = 0; i != files.length; i++) {
+    formData.append("files", files[i]);
+  }
+
+  $.ajax(
+    {
+      url: "/PhongTro/UploadFile",
+      data: formData,
+      processData: false,
+      contentType: false,
+      type: "POST",
+      success: function (data) {
+          if(data.status == "ok"){
+              alert("Files Uploaded!");
+          }
+      }
+    }
+  );
+}
+</script>

@@ -1,0 +1,251 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <h5 class="card-header">Danh sách các bài viết về phòng trọ</h5>
+    <div class="table-responsive text-nowrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tên</th>
+                    <th>Địa Chỉ</th>
+                    <th>Sức Chứa</th>
+                    <th>Giá</th>
+                    <th>Ngày Đăng</th>
+                    <th>Ngày Hết Hạn</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody class="load-list">
+               
+            </tbody>
+            <tfoot class="table-border-bottom-0">
+                <tr>
+                    <th>Tên</th>
+                    <th>Địa Chỉ</th>
+                    <th>Sức Chứa</th>
+                    <th>Giá</th>
+                    <th>Ngày Đăng</th>
+                    <th>Ngày Hết Hạn</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="demo-inline-spacing">
+            <!-- Basic Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination" id="load-pagination">
+                    @*<li class="page-item first">
+                        <a class="page-link" href="javascript:void(0);"><i class="tf-icon bx bx-chevrons-left"></i></a>
+                    </li>
+                    <li class="page-item prev">
+                        <a class="page-link" href="javascript:void(0);"><i class="tf-icon bx bx-chevron-left"></i></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="javascript:void(0);">1</a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link" href="javascript:void(0);">3</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="javascript:void(0);">4</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="javascript:void(0);">5</a>
+                    </li>
+                    <li class="page-item next">
+                        <a class="page-link" href="javascript:void(0);"><i class="tf-icon bx bx-chevron-right"></i></a>
+                    </li>
+                    <li class="page-item last">
+                        <a class="page-link" href="javascript:void(0);"><i class="tf-icon bx bx-chevrons-right"></i></a>
+                    </li>*@
+                </ul>
+            </nav>
+            <!--/ Basic Pagination -->
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel1">Xác nhận xoá</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label for="nameBasic" class="form-label">Bạn có muốn xoá bài đăng về phòng
+                                     trọ này không?
+                                </label>
+                                <input id="idPhongTroDelete" hidden/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="DeletePhongTro()">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(function(){
+        // function load pagination
+        var load = function(txtSearch, page) {
+            $.ajax({
+                url: '/PhongTro/GetAllPost',
+                type: 'get',
+                data: {txtSearch: txtSearch, page: page},
+                success: function(result){
+                    console.log(result);
+                    var str = "";
+                    $.each(result.data, function(index, value){
+                        // Formatted Ngay dang bai
+                        var ngayDang = new Date(value.ngayDang);
+                        var NgayDang_str = ((ngayDang.getMonth() > 8) ? (ngayDang.getMonth() + 1) :
+                        ('0' + (ngayDang.getMonth() + 1))) + '/' + ((ngayDang.getDate() > 9) 
+                        ? ngayDang.getDate() : ('0' + ngayDang.getDate())) 
+                        + '/' + ngayDang.getFullYear();
+
+                        // Formatted Ngay het han cho dat tro
+                        var ngayHetHan = new Date(value.ngayHetHan);
+                        var ngayHetHan_str = ((ngayHetHan.getMonth() > 8) ? (ngayHetHan.getMonth() + 1) :
+                        ('0' + (ngayHetHan.getMonth() + 1))) + '/' + ((ngayHetHan.getDate() > 9) 
+                        ? ngayHetHan.getDate() : ('0' + ngayHetHan.getDate())) 
+                        + '/' + ngayHetHan.getFullYear();
+
+                        // Create list post
+                        str += '<tr id="row'+ value.id +'">';
+                        str += "<td>"+(value.ten)+"</td>";
+                        str += "<td>"+value.diaChi + "</td>";
+                        str += "<td>" + value.sucChua + "</td>";
+                        str += "<td>" + value.gia + "</td>";
+                        str += "<td>"+ NgayDang_str + "</td>";
+                        str += "<td>"+ ngayHetHan_str + "</td>";
+                        str += "<td>";
+                        str += '<div class="dropdown">';
+                        str += '<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">';
+                        str += '<i class="bx bx-dots-vertical-rounded"></i>';
+                        str += '</button>';
+                        str += '<div class="dropdown-menu">';
+                        str += '<a class="dropdown-item" href="/PhongTro/Edit/'+ value.id +'"><i class="bx bx-edit-alt me-1"></i> Edit</a>';
+                        //str += '<a class="dropdown-item" href="/PhongTro/Delete/'+ value.id +'"><i class="bx bx-trash me-1"></i> Delete</a>';
+                        str += '<a class="dropdown-item" onclick="deleteConfirm('+ value.id +')"><i class="bx bx-trash me-1"></i> Delete</a>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '</td>';
+                        str += "</tr>";
+
+                        // Create pagination
+                        var pagination_string = "";
+                        var pageCurrent = result.pageCurrent;
+                        var numSize = result.numSize;
+
+                        // Create button previous
+                        if(pageCurrent > 1){
+                            var pagePrevious = pageCurrent - 1;
+                            pagination_string += '<li class="page-item">';
+                            pagination_string += '<a class="page-link" href="" data-page="'+ pagePrevious +'">Previous</a>';
+                            pagination_string += '</li>';
+                        }
+
+                        for(var i = 1; i <= numSize; i++){
+                            if(i == pageCurrent) {
+                                pagination_string += '<li class="page-item active">';
+                                pagination_string += '<a class="page-link" href="" data-page="'+ i +'">'+ pageCurrent +'</a>';
+                                pagination_string += '</li>';
+                            } else {
+                                pagination_string += '<li class="page-item">';
+                                pagination_string += '<a class="page-link" href="" data-page="'+ i +'">'+ i +'</a>';
+                                pagination_string += '</li>';
+                            }
+                        }
+
+                        // Create button next
+                        if(pageCurrent > 0 && pageCurrent < numSize){
+                            var pageNext = pageCurrent + 1;
+                            pagination_string += '<li class="page-item">';
+                            pagination_string += '<a class="page-link" href="" data-page="'+ pageNext +'">Previous</a>';
+                            pagination_string += '</li>';
+                        }
+
+                        // Load pagination
+                        $("#load-pagination").html(pagination_string);
+                    });
+
+                    // Load str to class="load-list"
+                    $(".load-list").html(str);
+                }
+            });
+        }
+
+        
+
+        // Click event pagination
+        $("body").on("click", ".pagination li a", function(event) {
+            event.preventDefault();
+            var page = $(this).attr('data-page');
+
+            // Load event pagination
+            var txtSearch = $('.txtSearch').val();
+            if(txtSearch != ""){
+                load(txtSearch, page);
+            }else {
+                load(null, page);
+            }
+        });
+
+        // Click event search
+        //$('#search').click(function() {
+        //    var txtSearch = $('.txtSearch').val();
+        //    if(txtSearch != ''){
+        //        load(txtSearch, 1);
+        //    } else {
+        //        load(null, 1);
+        //        }
+        //    });
+        //});
+
+        // Load init
+        load(null, 1);
+     });
+
+
+     function deleteConfirm(id){
+         console.log('confirm delete phong tro ' + id);
+         $('#idPhongTroDelete').val(id);
+         $('#deleteConfirmModal').modal('show');
+     }
+
+     function DeletePhongTro(){
+         var id = $('#idPhongTroDelete').val();
+         console.log('deleting phong tro ' + id);
+         $.ajax({
+             url: '/PhongTro/DeletePhongTro',
+             method: 'post',
+             data: {id: id},
+             success: function(result){
+                 if(result.status == "ok"){
+                     console.log('delete phong tro ' + id + ' successfully');
+                     $('#deleteConfirmModal').modal('hide');
+                     $('#row' + id).hide();
+                 }
+             },
+             error: function(error){
+                 $('#deleteConfirmModal').modal('hide');
+                 console.log(error);
+             }
+         });
+     }
+</script>

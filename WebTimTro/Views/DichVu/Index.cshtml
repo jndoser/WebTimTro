@@ -1,0 +1,116 @@
+﻿@model List<WebTimTro.Models.DichVuVM>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row" style="margin: 20px 5px 20px 5px; ">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Danh sách các dịch vụ hiện tại</h5>
+                <small class="text-muted float-end"></small>
+            </div>
+            <div class="card-body">
+                <div class="card">
+                    <h5 class="card-header">Danh sách các dịch vụ hiện tại</h5>
+                    <div class="table-responsive text-nowrap">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Tên dịch vụ</th>
+                                    <th>Icon</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody class="table-border-bottom-0">
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>@item.Id</strong></td>
+                                            <td>@item.Ten</td>
+                                            <td>
+                                                <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+                                                    <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="Lilian Fuller">
+                                                        <img src="../assets/img/avatars/5.png" alt="Avatar" class="rounded-circle">
+                                                    </li>
+                                                    <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="Sophia Wilkerson">
+                                                        <img src="../assets/img/avatars/6.png" alt="Avatar" class="rounded-circle">
+                                                    </li>
+                                                    <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="Christina Parker">
+                                                        <img src="../assets/img/avatars/7.png" alt="Avatar" class="rounded-circle">
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                        <i class="bx bx-dots-vertical-rounded"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-edit-alt me-1"></i> Edit</a>
+                                                        <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Tạo mới hoặc chỉnh sửa dịch vụ</h5>
+                <small class="text-muted float-end"></small>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label" for="basic-icon-default-fullname">Tên dịch vụ</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basic-icon-default-fullname2" class="input-group-text"><i class="bx bx-info-circle"></i></span>
+                            <input type="text" class="form-control" id="tenDichVu" placeholder="Tên dịch vụ phòng trọ cung cấp"
+                            aria-label="John Doe" aria-describedby="basic-icon-default-fullname2">
+                        </div>
+                    </div>
+                    @*<div class="mb-3">
+                        <label class="form-label" for="basic-icon-default-company">Icon dịch vụ</label>
+                        <div class="input-group input-group-merge">
+                            <span id="basic-icon-default-company2" class="input-group-text"><i class="bx bx-buildings"></i></span>
+                            <input type="text" id="basic-icon-default-company" class="form-control" placeholder="ACME Inc." aria-label="ACME Inc." aria-describedby="basic-icon-default-company2">
+                        </div>
+                    </div>*@
+                    <button type="submit" class="btn btn-primary" onclick="SaveDichVu()">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function SaveDichVu(){
+    var tenDichVu = $('#tenDichVu').val();
+    const dichVu = {
+        ten = tenDichVu
+    };
+    
+    $.ajax({
+        url: '/DichVu/SaveDichVu',
+        method: 'post',
+        data: {dichVu: dichVu},
+        success: function(result){
+
+        },
+        error: function(err){
+            console.log(err);
+        }
+    });
+}
+</script>
