@@ -31,5 +31,15 @@ namespace WebTimTro.Repository
             //    _context.DichVus.Remove(dichVu);
             //}
         }
+
+        // Lấy id của dịch vụ mới thêm vào cơ sở dữ liệu
+        public int GetAddedDichVuId()
+        {
+            if(_context.DichVus.ToList().Count == 0)
+            {
+                return 1;
+            }
+            return _context.DichVus.Select(x => x.Id).Max();
+        }
     }
 }

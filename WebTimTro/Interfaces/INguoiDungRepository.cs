@@ -1,4 +1,5 @@
-﻿using WebTimTro.Data;
+﻿using System.Collections.Generic;
+using WebTimTro.Data;
 
 namespace WebTimTro.Interfaces
 {
@@ -9,5 +10,6 @@ namespace WebTimTro.Interfaces
         public string GetNameByUserName(string username);
         public string GetUserId();
         public bool IsAuthenticated();
+        public ICollection<NguoiDung> GetAllNguoiDungWithNguoiDungRole();
     }
 }
