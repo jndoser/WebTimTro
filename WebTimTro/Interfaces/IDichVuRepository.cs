@@ -5,5 +5,6 @@ namespace WebTimTro.Interfaces
     public interface IDichVuRepository: IGenericRepository<DichVu>
     {
         public void DeleteDichVusByPhongTroId(int phongTroId);
+        public int GetAddedDichVuId();
     }
 }

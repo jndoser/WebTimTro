@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -70,6 +71,24 @@ namespace WebTimTro.Repository
         public bool IsAuthenticated()
         {
             return _httpContext.HttpContext.User.Identity.IsAuthenticated;
+        }
+
+        // Lấy ra tất cả người dùng với role là người dùng
+        public ICollection<NguoiDung> GetAllNguoiDungWithNguoiDungRole()
+        {
+            ICollection<NguoiDung> result = new List<NguoiDung>();
+            var userIds = _context.UserRoles
+                .Where(x => x.RoleId.Equals("nguoidung"))
+                .Select(x => x.UserId);
+
+            foreach(var id in userIds)
+            {
+                var nguoiDung = _context.NguoiDungs
+                    .FirstOrDefault(x => x.Id.Equals(id));
+                result.Add(nguoiDung);
+            }
+
+            return result;
         }
     }
 }

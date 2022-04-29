@@ -28,7 +28,7 @@ namespace WebTimTro.Controllers
         }
         public IActionResult Index()
         {
-            var users = _unitOfWork.NguoiDung.GetAll();
+            var users = _unitOfWork.NguoiDung.GetAllNguoiDungWithNguoiDungRole();
             var usersModel = _mapper.Map<IEnumerable<NguoiDung>, IEnumerable<NguoiDungVM>>(users);
 
             return View(usersModel);

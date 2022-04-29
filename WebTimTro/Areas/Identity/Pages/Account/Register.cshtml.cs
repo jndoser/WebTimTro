@@ -75,11 +75,15 @@ namespace WebTimTro.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new NguoiDung { UserName = Input.Email, Email = Input.Email };
+                var user = new NguoiDung { UserName = Input.Email, Email = Input.Email, 
+                RegristeredAt = DateTime.Now};
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    // Mặc định khi đăng ký tài khoản mới, người dùng sẽ được
+                    // cấp quyền Nguoidung
                     await _userManager.AddToRoleAsync(user, "Nguoidung");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
