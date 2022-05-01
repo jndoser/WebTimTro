@@ -11,5 +11,6 @@ namespace WebTimTro.Interfaces
         public string GetUserId();
         public bool IsAuthenticated();
         public ICollection<NguoiDung> GetAllNguoiDungWithNguoiDungRole();
+        public ICollection<NguoiDung> GetAllNguoiDungWithChuTroRole();
     }
 }

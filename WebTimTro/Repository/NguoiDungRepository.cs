@@ -90,5 +90,23 @@ namespace WebTimTro.Repository
 
             return result;
         }
+
+        // Lấy ra tất cả người dùng với role là chủ trọ
+        public ICollection<NguoiDung> GetAllNguoiDungWithChuTroRole()
+        {
+            ICollection<NguoiDung> result = new List<NguoiDung>();
+            var userIds = _context.UserRoles
+                .Where(x => x.RoleId.Equals("chutro"))
+                .Select(x => x.UserId);
+
+            foreach (var id in userIds)
+            {
+                var nguoiDung = _context.NguoiDungs
+                    .FirstOrDefault(x => x.Id.Equals(id));
+                result.Add(nguoiDung);
+            }
+
+            return result;
+        }
     }
 }

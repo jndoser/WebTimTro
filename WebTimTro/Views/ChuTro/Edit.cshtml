@@ -1,0 +1,104 @@
+﻿@model WebTimTro.Models.NguoiDungVM
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="col-md-12" style="margin-left:50px; margin-right:50px; margin-top:30px">
+    <div class="card mb-4">
+        <h5 class="card-header">Profile Details</h5>
+        <div style="margin-left:20px;">
+            <a asp-action="Index">Back to List</a>
+        </div>
+        <!-- Account -->
+        <form asp-action="Edit" enctype="multipart/form-data" method="post" >
+        <div class="card-body">
+            
+            <div class="d-flex align-items-start align-items-sm-center gap-4">
+                <img src="~/assets/images/@(Model.Avatar)" alt="user-avatar"
+                class="d-block rounded" id="uploadedAvatar" width="100" height="100">
+                <div class="button-wrapper">
+                    <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
+                        <span class="d-none d-sm-block">Upload new photo</span>
+                        <i class="bx bx-upload d-block d-sm-none"></i>
+                        <input type="file" id="upload"
+                        asp-for="UploadFile"
+                        class="account-file-input" accept="image/png, image/jpeg" hidden="">
+                    </label>
+                    <button type="button" class="btn btn-outline-secondary account-image-reset mb-4">
+                        <i class="bx bx-reset d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Reset</span>
+                    </button>
+
+                    <p class="text-muted mb-0">Allowed JPG, GIF or PNG. Max size of 800K</p>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="my-0">
+        <div class="card-body">
+            
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label asp-for="FirstName" class="form-label"></label>
+                        <input asp-for="FirstName" class="form-control" type="text" 
+                        value="@(Model.FirstName)" autofocus="">
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label asp-for="MiddleName" class="form-label"></label>
+                        <input asp-for="MiddleName" class="form-control" type="text"
+                        value="@(Model.MiddleName)">
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label asp-for="LastName" class="form-label"></label>
+                        <input asp-for="LastName" class="form-control" type="text" 
+                        value="@(Model.LastName)">
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label asp-for="Intro" class="form-label"></label>
+                        <input asp-for="Intro" class="form-control" type="text"
+                        value="@(Model.Intro)">
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label asp-for="Profile" class="form-label"></label>
+                        <input asp-for="Profile" type="text" class="form-control"
+                        value="@(Model.Profile)">
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" asp-for="Mobile"></label>
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text">VN (+84)</span>
+                            <input asp-for="Mobile" type="text" 
+                            class="form-control" placeholder="@(Model.Mobile)">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <button type="submit" class="btn btn-primary me-2">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                </div>
+            
+        </div>
+        </form>
+        <!-- /Account -->
+    </div>
+    <div class="card">
+        <h5 class="card-header">Delete Account</h5>
+        <div class="card-body">
+            <div class="mb-3 col-12 mb-0">
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading fw-bold mb-1">Are you sure you want to delete your account?</h6>
+                    <p class="mb-0">Once you delete your account, there is no going back. Please be certain.</p>
+                </div>
+            </div>
+            <form asp-action="Delete">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" asp-for="Id" hidden>
+                    <label class="form-check-label" for="accountActivation">I confirm my account deactivation</label>
+                </div>
+                <button type="submit" class="btn btn-danger deactivate-account">Deactivate Account</button>
+            </form>
+        </div>
+    </div>
+</div>
