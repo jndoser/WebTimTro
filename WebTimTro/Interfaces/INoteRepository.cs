@@ -7,5 +7,6 @@ namespace WebTimTro.Interfaces
         public int GetAddedNoteId();
         public int GetNoteIdByPhongTroId(int phongTroId);
         public void DeleteNotesByPhongTroId(int phongTroId);
+        public string GetNoteByPhongTroId(int phongTroId);
     }
 }

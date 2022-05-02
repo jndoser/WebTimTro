@@ -10,5 +10,6 @@ namespace WebTimTro.Interfaces
         // Xoá tất cả các hình ảnh của phòng trọ 
         // với phòng trọ Id
         public void DeleteHinhAnhsByPhongTroId(int phongTroId);
+        public List<string> GetFirstHinhAnhListOfPhongTroList();
     }
 }

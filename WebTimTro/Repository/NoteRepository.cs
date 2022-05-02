@@ -36,5 +36,15 @@ namespace WebTimTro.Repository
                 .FirstOrDefault(x => x.Id == noteId);
             _context.Notes.Remove(note);
         }
+
+        // Lấy nội dung ghi chú của chủ trọng với phòng trọ 
+        // tương ứng
+        public string GetNoteByPhongTroId(int phongTroId)
+        {
+            int noteId = _context.PhongTroNotes
+                .FirstOrDefault(x => x.PhongTroId == phongTroId).NoteId;
+
+            return _context.Notes.FirstOrDefault(x => x.Id == noteId).Ten;
+        }
     }
 }

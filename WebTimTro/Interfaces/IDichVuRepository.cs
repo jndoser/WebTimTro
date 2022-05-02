@@ -1,4 +1,5 @@
-﻿using WebTimTro.Data;
+﻿using System.Collections.Generic;
+using WebTimTro.Data;
 
 namespace WebTimTro.Interfaces
 {
@@ -6,5 +7,6 @@ namespace WebTimTro.Interfaces
     {
         public void DeleteDichVusByPhongTroId(int phongTroId);
         public int GetAddedDichVuId();
+        public List<string> GetSomeDichVuOfPhongTroList();
     }
 }
