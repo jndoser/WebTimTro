@@ -1,8 +1,33 @@
-﻿@{
+﻿@model IEnumerable<WebTimTro.Models.PhongTroVM>
+
+@{
     ViewData["Title"] = "Home Page";
+    List<PhongTroVM> phongTros = Model.ToList();
+    List<string> firstHinhAnhs = ViewBag.FirstHinhAnhs;
+    List<string> someDichVu =  ViewBag.SomeDichVu;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row mb-5" style="margin-left:10px;">
+    @for (int i = 0; i < phongTros.Count; i++)
+    {
+        <div class="col-md-6 col-lg-4">
+            <h6 class="mt-2 text-muted"></h6>
+            <div class="card">
+                <img class="card-img-top" src="/images/@firstHinhAnhs[i]" alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">@phongTros[i].Ten</h5>
+                    <p class="card-text">@phongTros[i].SucChua người ở</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">@someDichVu[i]</li>
+                    <li class="list-group-item">Giá: @phongTros[i].Gia VND</li>
+                </ul>
+                <div class="card-body">
+                    <a href="javascript:void(0)" class="card-link">Quan tâm</a>
+                    <a href="/Home/Detail/@phongTros[i].Id" class="card-link">Xem phòng trọ</a>
+                </div>
+            </div>
+        </div>
+    }
+
 </div>

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using WebTimTro.Data;
 using WebTimTro.Interfaces;
 
@@ -40,6 +41,49 @@ namespace WebTimTro.Repository
                 return 1;
             }
             return _context.DichVus.Select(x => x.Id).Max();
+        }
+
+        // Lấy ra 3 dịch vụ đầu tiên của mỗi phòng trọ
+        // nối lại thành 1 chuỗi để in ra view
+        public List<string> GetSomeDichVuOfPhongTroList()
+        {
+            List<string> result = new List<string>();
+            var phongTroIds = _context.PhongTros.Select(x => x.Id);
+            foreach(var id in phongTroIds)
+            {
+                List<string> tenDichVuList = GetTenDichVuListByPhongTroId(id);
+                string dichVuStr = "";
+                if (tenDichVuList.Count <= 3)
+                {                   
+                    foreach(string tenDichVu in tenDichVuList)
+                    {
+                        dichVuStr += tenDichVu + " * ";
+                    }
+                    result.Add(dichVuStr.Substring(0, dichVuStr.Length - 2));
+                } else
+                {
+                    for(int i = 0; i <= 2; i++)
+                    {
+                        dichVuStr += tenDichVuList[i] + " * ";
+                    }
+                    result.Add(dichVuStr.Substring(0, dichVuStr.Length - 2));
+                } 
+            }
+            return result;
+        }
+
+        // Lấy ra danh sách tên dịch vụ của phòng trọ với id cho trước
+        private List<string> GetTenDichVuListByPhongTroId(int phongTroId)
+        {
+            List<string> result = new List<string>();
+            var dichVuIds = _context.PhongTroDichVus.Where(x => x.PhongTroId == phongTroId)
+                .Select(x => x.DichVuId);
+            foreach(var id in dichVuIds)
+            {
+                string tenDichVu = _context.DichVus.FirstOrDefault(x => x.Id == id).Ten;
+                result.Add(tenDichVu);
+            }
+            return result;
         }
     }
 }

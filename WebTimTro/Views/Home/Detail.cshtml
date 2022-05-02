@@ -1,0 +1,106 @@
+﻿@model WebTimTro.Models.PhongTroVM
+
+@{
+    ViewData["Title"] = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<string> hinhAnhs = ViewBag.HinhAnhs;
+    string note = ViewBag.Note;
+    List<DichVuVM> dichVusVM = ViewBag.DichVuCuaPhongTro;
+}
+
+<div class="card-group mb-5" style="margin-left:75px; margin-top:20px;">
+    <div class="row" style="margin-left:30px;">
+        @if (hinhAnhs.Count != 0)
+        {
+            if (hinhAnhs.Count == 1)
+            {
+                <div class="col-5" style="margin-left:20px;">
+                    <img class="card-img-top" src="/images/@hinhAnhs[0]" alt="Card image cap">
+                </div>
+            }
+            else
+            {
+                @for (int i = 0; i < 2; i++)
+                {
+                    <div class="col-5" style="margin-left:20px;">
+                        <img class="card-img-top" src="/images/@hinhAnhs[i]" alt="Card image cap">
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="card mb-4 col-7">
+        <div class="card-body">
+            <div>
+                <div class="row mb-3">
+                    <div class="py-3">
+                        <h3 class="mb-0">@Model.Ten</h3>
+                    </div>
+                    <div class="align-middle"><small class="text-light fw-semibold">@Model.SucChua người ở * @Model.DiaChi</small></div>
+                </div>
+                <div class="row mb-3">
+                    <div>
+                        <div class="align-middle"><small class="text-light fw-semibold">Những điều bạn cần lưu ý</small></div>
+                        <div class="py-3">
+                            <p class="mb-0">
+                                @note
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div>
+                        <div class="align-middle"><small class="text-light fw-semibold">Mô tả của chủ trọ</small></div>
+                        <div class="py-3">
+                            <p class="mb-0">
+                                @Html.Raw(Model.MoTa)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-6">
+                        <small class="text-light fw-semibold">Những dịch vụ mà phòng trọ này cung cấp</small>
+                        <div class="demo-inline-spacing mt-3">
+                            <ul class="list-group">
+                                @foreach (DichVuVM dichVu in dichVusVM)
+                                {
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <i class="bx bx-tv me-2"></i>
+                                        @dichVu.Ten
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-4 col-4">
+        <div class="card-body">
+            <h5 class="card-title">Giá trọ: @Model.Gia</h5>
+            <div class="card-subtitle text-muted mb-3">Ngày hết hạn đặt trọ: @Model.NgayHetHan</div>
+            <p class="card-text">
+                
+            </p>
+            <a href="javascript:void(0)" class="card-link">Đặt phòng trọ</a>
+            <a href="javascript:void(0)" class="card-link">Kiểm tra tình trạng trọ</a>
+        </div>
+        <div class="card-body">
+            <div class="card bg-dark border-0 text-white">
+                <img class="card-img" src="/images/duck.jpg" alt="Card image">
+                <div class="card-img-overlay">
+                    <h5 class="card-title">Card title</h5>
+                    <p class="card-text">
+                        This is a wider card with supporting text below as a natural lead-in to additional content. This
+                        content is a little bit longer.
+                    </p>
+                    <p class="card-text">Last updated 3 mins ago</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
