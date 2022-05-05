@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using WebTimTro.Data;
 using WebTimTro.Interfaces;
@@ -26,6 +27,21 @@ namespace WebTimTro.Repository
         public int GetAddedPostId()
         {
             return _context.PhongTros.Select(x => x.Id).Max();
+        }
+
+        // Lấy ra tất cả các phòng trọ mà người dùng đã lưu
+        public List<PhongTro> GetPhongTrosByNguoiDungId(string nguoiDungId)
+        {
+            List<PhongTro> result = new List<PhongTro>();
+            var phongTroIds = _context.PhongTroLuuTrus.Where(x => x.NguoiDungId.Equals(nguoiDungId))
+                .Select(x => x.PhongTroId);
+            foreach(var item in phongTroIds)
+            {
+                PhongTro phongTro = _context.PhongTros.FirstOrDefault(x => x.Id == item);
+                result.Add(phongTro);
+            }
+
+            return result;
         }
     }
 }

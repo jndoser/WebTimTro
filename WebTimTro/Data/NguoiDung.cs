@@ -20,5 +20,8 @@ namespace WebTimTro.Data
 
         // 1 người dùng (chủ trọ) có thể tạo nhiều bài đăng về phòng trọ 
         public ICollection<PhongTro> PhongTros { get; set; }
+
+        // 1 người dùng có thể có nhiều phòng trọ lưu trữ
+        public ICollection<PhongTroLuuTru> PhongTroLuuTrus { get; set; }
     }
 }

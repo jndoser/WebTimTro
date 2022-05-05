@@ -1,0 +1,129 @@
+﻿@model List<WebTimTro.Models.PhongTroVM>
+
+@{
+    ViewData["Title"] = "Saved";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <h5 class="card-header">Danh sách các bài viết về phòng trọ</h5>
+    <div class="table-responsive text-nowrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tên</th>
+                    <th>Địa Chỉ</th>
+                    <th>Sức Chứa</th>
+                    <th>Giá</th>
+                    <th>Ngày Đăng</th>
+                    <th>Ngày Hết Hạn</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody class="load-list">
+                @foreach (var item in Model)
+                {
+                    <tr id="row@(item.Id)">
+                        <td>@Html.DisplayFor(modelItem => item.Ten)</td>
+                        <td>@Html.DisplayFor(modelItem => item.DiaChi)</td>
+                        <td>@Html.DisplayFor(modelItem => item.SucChua)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Gia)</td>
+                        <td>@Html.DisplayFor(modelItem => item.NgayDang)</td>
+                        <td>@Html.DisplayFor(modelItem => item.NgayHetHan)</td>
+                        <td>
+                            <div class="dropdown">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="/Home/Detail/@item.Id">
+                                        <i class="bx bx-edit-alt me-1"></i>View
+                                    </a>
+                                    <a class="dropdown-item" onclick="deleteConfirm(@(item.Id))"><i class="bx bx-trash me-1"></i>Delete</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-border-bottom-0">
+                <tr>
+                    <th>Tên</th>
+                    <th>Địa Chỉ</th>
+                    <th>Sức Chứa</th>
+                    <th>Giá</th>
+                    <th>Ngày Đăng</th>
+                    <th>Ngày Hết Hạn</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="demo-inline-spacing">
+            <!-- Basic Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination" id="load-pagination">
+                </ul>
+            </nav>
+            <!--/ Basic Pagination -->
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel1">Xác nhận xoá</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label for="nameBasic" class="form-label">
+                                    Bạn có muốn xoá bài viết đã lưu về phòng
+                                    trọ này không?
+                                </label>
+                                <input id="idPhongTroDelete" hidden />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="DeletePhongTro()">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function deleteConfirm(id){
+         console.log('confirm delete phong tro da luu ' + id);
+         $('#idPhongTroDelete').val(id);
+         $('#deleteConfirmModal').modal('show');
+     }
+
+    function DeletePhongTro(){
+         var id = $('#idPhongTroDelete').val();
+         console.log('deleting phong tro da luu ' + id);
+         $.ajax({
+             url: '/PhongTro/DeleteSavedPhongTro',
+             method: 'post',
+             data: {id: id},
+             success: function(result){
+                 if(result.status == "ok"){
+                     console.log('delete phong tro da luu ' + id + ' successfully');
+                     $('#deleteConfirmModal').modal('hide');
+                     $('#row' + id).hide();
+                 }
+             },
+             error: function(error){
+                 $('#deleteConfirmModal').modal('hide');
+                 console.log(error);
+             }
+         });
+     }
+</script>

@@ -228,6 +228,7 @@
                 <div data-i18n="Boxicons">Reported Comment</div>
               </a>
             </li>
+            <partial name="_LoginPartial" />
           </ul>
         </aside>
         <!-- / Menu -->
@@ -354,5 +355,6 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
   </body>
 </html>

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -396,6 +397,34 @@ namespace WebTimTro.Controllers
             }
 
             return Json(new { status = "error" });
+        }
+
+        // Hiển thị các phòng trọ đã lưu
+        // [Authorize(Roles = "nguoidung")]
+        public IActionResult Saved()
+        {
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            List<PhongTro> phongTros = _unitOfWork.PhongTro
+                .GetPhongTrosByNguoiDungId(nguoiDungId);
+            List<PhongTroVM> phongTroVM = _mapper.Map<List<PhongTroVM>>(phongTros);
+
+            return View(phongTroVM);
+        }
+
+        // Xoá bài viết mà người dùng đã lưu với id cho trước
+        public JsonResult DeleteSavedPhongTro(int id)
+        {
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            PhongTroLuuTru phongTroLuuTru = _unitOfWork.PhongTroLuuTru
+                .GetPhongTroLuuTruByNguoiDungIdAndPhongTroId(nguoiDungId, id);
+            _unitOfWork.PhongTroLuuTru.Delete(phongTroLuuTru);
+            if (_unitOfWork.Save())
+            {
+                return Json(new { status = "ok" });
+            } else
+            {
+                return Json(new { status = "err" });
+            }
         }
     }
 }

@@ -67,6 +67,41 @@ namespace WebTimTro.Controllers
             return View(phongTroVM);
         }
 
+        public JsonResult SavePhongTro(int id)
+        {
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            PhongTroLuuTru phongTroLuuTru = new PhongTroLuuTru
+            {
+                NguoiDungId = nguoiDungId,
+                PhongTroId = id
+            };
+            _unitOfWork.PhongTroLuuTru.Create(phongTroLuuTru);
+            if (_unitOfWork.Save())
+            {
+                return new JsonResult(new { status = "ok" });
+            } else
+            {
+                return new JsonResult(new { status = "err" });
+            }
+        }
+
+        public JsonResult UnSavePhongTro(int id)
+        {
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            PhongTroLuuTru phongTroLuuTru = _unitOfWork
+                .PhongTroLuuTru.GetPhongTroLuuTruByNguoiDungIdAndPhongTroId(nguoiDungId, id);
+
+            _unitOfWork.PhongTroLuuTru.Delete(phongTroLuuTru);
+            if (_unitOfWork.Save())
+            {
+                return new JsonResult(new { status = "ok" });
+            }
+            else
+            {
+                return new JsonResult(new { status = "err" });
+            }
+        }
+
         public IActionResult Privacy()
         {
             return View();
