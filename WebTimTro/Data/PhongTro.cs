@@ -30,5 +30,9 @@ namespace WebTimTro.Data
         public ICollection<PhongTroNote> PhongTroNotes { get; set; }
         // 1 phòng trọ có thể có nhiều hình ảnh 
         public ICollection<PhongTroHinhAnh> PhongTroHinhAnhs { get; set; }
+
+        // 1 phòng trọ có thể có nhiều phòng trọ lưu trữ, tức là có thể
+        // được lưu bởi nhiều người
+        public ICollection<PhongTroLuuTru> PhongTroLuuTrus { get; set; }
     }
 }

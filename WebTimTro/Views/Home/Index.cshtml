@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<WebTimTro.Models.PhongTroVM>
+@inject WebTimTro.Interfaces.IUnitOfWork _unitOfWork
+
 
 @{
     ViewData["Title"] = "Home Page";
@@ -25,9 +27,49 @@
                 <div class="card-body">
                     <a href="javascript:void(0)" class="card-link">Quan tâm</a>
                     <a href="/Home/Detail/@phongTros[i].Id" class="card-link">Xem phòng trọ</a>
+                    <a id="isSavedPhongTro" style="cursor:pointer;" onclick="Save(@phongTros[i].Id)"
+                    class="card-link">
+                         @(_unitOfWork.PhongTroLuuTru.IsSaved(_unitOfWork.NguoiDung.GetUserId(), 
+                         phongTros[i].Id) ? "Đã Lưu" : "Lưu")
+                        </a>
                 </div>
             </div>
         </div>
     }
-
 </div>
+<script>
+    function Save(id) {
+        var isSaved = $('#isSavedPhongTro').html();
+        console.log(isSaved);
+        if(isSaved.trim() == "Lưu"){
+            $.ajax({
+                url: '/Home/SavePhongTro',
+                method: 'post',
+                data: {id : id},
+                success: function(result) {
+                    if(result.status == "ok"){
+                        $('#isSavedPhongTro').html('Đã lưu');
+                    }      
+                },
+                error: function(err){
+                    console.log(err);
+                }
+            });
+        } else {
+            $.ajax({
+                url: '/Home/UnSavePhongTro',
+                method: 'post',
+                data: {id : id},
+                success: function(result) {
+                    if(result.status == "ok"){
+                        $('#isSavedPhongTro').html('Lưu');
+                    }      
+                },
+                error: function(err){
+                    console.log(err);
+                }
+            });       
+        }
+    }
+
+</script>
