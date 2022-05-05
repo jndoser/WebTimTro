@@ -51,9 +51,16 @@ namespace WebTimTro.Controllers
             PhongTroVM phongTroVM = _mapper
                 .Map<PhongTroVM>(phongTro);
 
-            List<string> hinhAnhs = _unitOfWork.HinhAnh
-                .GetFirstHinhAnhListOfPhongTroList();
-            ViewBag.HinhAnhs = hinhAnhs;
+            List<HinhAnh> hinhAnhs = _unitOfWork.PhongTroHinhAnh
+                .GetHinhAnhsByPhongTroId(id);
+
+            List<string> hinhAnhFileNames = new List<string>();
+            foreach(HinhAnh hinhAnh in hinhAnhs)
+            {
+                hinhAnhFileNames.Add(hinhAnh.Filename);
+            }
+
+            ViewBag.HinhAnhFileNames = hinhAnhFileNames;
 
             ViewBag.Note = _unitOfWork.Note.GetNoteByPhongTroId(id);
 
@@ -92,6 +99,42 @@ namespace WebTimTro.Controllers
                 .PhongTroLuuTru.GetPhongTroLuuTruByNguoiDungIdAndPhongTroId(nguoiDungId, id);
 
             _unitOfWork.PhongTroLuuTru.Delete(phongTroLuuTru);
+            if (_unitOfWork.Save())
+            {
+                return new JsonResult(new { status = "ok" });
+            }
+            else
+            {
+                return new JsonResult(new { status = "err" });
+            }
+        }
+
+        public JsonResult QuanTamPhongTro(int id)
+        {
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            PhongTroQuanTam phongTroQuanTam = new PhongTroQuanTam
+            {
+                NguoiDungId = nguoiDungId,
+                PhongTroId = id
+            };
+            _unitOfWork.PhongTroQuanTam.Create(phongTroQuanTam);
+            if (_unitOfWork.Save())
+            {
+                return new JsonResult(new { status = "ok" });
+            }
+            else
+            {
+                return new JsonResult(new { status = "err" });
+            }
+        }
+
+        public JsonResult BoQuanTamPhongTro(int id)
+        {
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            PhongTroQuanTam phongTroQuanTam = _unitOfWork
+                .PhongTroQuanTam.GetPhongTroQuanTamByNguoiDungIdAndPhongTroId(nguoiDungId, id);
+
+            _unitOfWork.PhongTroQuanTam.Delete(phongTroQuanTam);
             if (_unitOfWork.Save())
             {
                 return new JsonResult(new { status = "ok" });

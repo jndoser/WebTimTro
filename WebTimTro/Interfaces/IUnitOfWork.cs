@@ -12,6 +12,7 @@
         IHinhAnhRepository HinhAnh { get; }
         IPhongTroHinhAnhRepository PhongTroHinhAnh { get; }
         IPhongTroLuuTruRepository PhongTroLuuTru { get; }
+        IPhongTroQuanTamRepository PhongTroQuanTam { get; }
 
         bool Save();
         void Dispose();

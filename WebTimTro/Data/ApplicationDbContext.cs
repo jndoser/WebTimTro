@@ -24,6 +24,7 @@ namespace WebTimTro.Data
         public DbSet<HinhAnh> HinhAnhs { get; set; }
         public DbSet<PhongTroHinhAnh> PhongTroHinhAnhs { get; set; }
         public DbSet<PhongTroLuuTru> PhongTroLuuTrus { get; set; }
+        public DbSet<PhongTroQuanTam> PhongTroQuanTams { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -35,6 +36,7 @@ namespace WebTimTro.Data
             builder.ApplyConfiguration(new PhongTroHinhAnhConfiguration());
             builder.ApplyConfiguration(new DichVuSeedConfiguration());
             builder.ApplyConfiguration(new PhongTroLuuTruConfiguration());
+            builder.ApplyConfiguration(new PhongTroQuanTamConfiguration());
 
 
             base.OnModelCreating(builder);

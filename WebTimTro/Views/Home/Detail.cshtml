@@ -3,19 +3,19 @@
 @{
     ViewData["Title"] = "Detail";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    List<string> hinhAnhs = ViewBag.HinhAnhs;
+    List<string> hinhAnhFileNames = ViewBag.HinhAnhFileNames;
     string note = ViewBag.Note;
     List<DichVuVM> dichVusVM = ViewBag.DichVuCuaPhongTro;
 }
 
 <div class="card-group mb-5" style="margin-left:75px; margin-top:20px;">
     <div class="row" style="margin-left:30px;">
-        @if (hinhAnhs.Count != 0)
+        @if (hinhAnhFileNames.Count != 0)
         {
-            if (hinhAnhs.Count == 1)
+            if (hinhAnhFileNames.Count == 1)
             {
                 <div class="col-5" style="margin-left:20px;">
-                    <img class="card-img-top" src="/images/@hinhAnhs[0]" alt="Card image cap">
+                    <img class="card-img-top" src="/images/@hinhAnhFileNames[0]" alt="Card image cap">
                 </div>
             }
             else
@@ -23,7 +23,7 @@
                 @for (int i = 0; i < 2; i++)
                 {
                     <div class="col-5" style="margin-left:20px;">
-                        <img class="card-img-top" src="/images/@hinhAnhs[i]" alt="Card image cap">
+                        <img class="card-img-top" src="/images/@hinhAnhFileNames[i]" alt="Card image cap">
                     </div>
                 }
             }

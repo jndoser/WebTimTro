@@ -25,9 +25,12 @@
                     <li class="list-group-item">Giá: @phongTros[i].Gia VND</li>
                 </ul>
                 <div class="card-body">
-                    <a href="javascript:void(0)" class="card-link">Quan tâm</a>
+                    <a id="isQuanTamPhongTro@(phongTros[i].Id)" style="cursor:pointer;" onclick="QuanTam(@phongTros[i].Id)" class="card-link">
+                        @(_unitOfWork.PhongTroQuanTam.IsQuanTam(_unitOfWork.NguoiDung.GetUserId(), 
+                         phongTros[i].Id) ? "Đã quan tâm" : "Quan tâm")
+                        </a>
                     <a href="/Home/Detail/@phongTros[i].Id" class="card-link">Xem phòng trọ</a>
-                    <a id="isSavedPhongTro" style="cursor:pointer;" onclick="Save(@phongTros[i].Id)"
+                    <a id="isSavedPhongTro@(phongTros[i].Id)" style="cursor:pointer;" onclick="Save(@phongTros[i].Id)"
                     class="card-link">
                          @(_unitOfWork.PhongTroLuuTru.IsSaved(_unitOfWork.NguoiDung.GetUserId(), 
                          phongTros[i].Id) ? "Đã Lưu" : "Lưu")
@@ -39,7 +42,7 @@
 </div>
 <script>
     function Save(id) {
-        var isSaved = $('#isSavedPhongTro').html();
+        var isSaved = $('#isSavedPhongTro' + id).html();
         console.log(isSaved);
         if(isSaved.trim() == "Lưu"){
             $.ajax({
@@ -48,7 +51,7 @@
                 data: {id : id},
                 success: function(result) {
                     if(result.status == "ok"){
-                        $('#isSavedPhongTro').html('Đã lưu');
+                        $('#isSavedPhongTro' + id).html('Đã lưu');
                     }      
                 },
                 error: function(err){
@@ -62,7 +65,7 @@
                 data: {id : id},
                 success: function(result) {
                     if(result.status == "ok"){
-                        $('#isSavedPhongTro').html('Lưu');
+                        $('#isSavedPhongTro' + id).html('Lưu');
                     }      
                 },
                 error: function(err){
@@ -72,4 +75,41 @@
         }
     }
 
+    function QuanTam(id) {
+        var isSaved = $('#isQuanTamPhongTro' + id).html();
+        console.log(isSaved);
+        if(isSaved.trim() == "Quan tâm"){
+            console.log('Đang quan tâm phòng trọ ' + id);
+            $.ajax({
+                url: '/Home/QuanTamPhongTro',
+                method: 'post',
+                data: {id : id},
+                success: function(result) {
+                    if(result.status == "ok"){
+                        console.log('Đã quan tâm phòng trọ ' + id);
+                        $('#isQuanTamPhongTro' + id).html('Đã quan tâm');
+                    }      
+                },
+                error: function(err){
+                    console.log(err);
+                }
+            });
+        } else {
+            console.log('Đang bỏ quan tâm phòng trọ ' + id);
+            $.ajax({
+                url: '/Home/BoQuanTamPhongTro',
+                method: 'post',
+                data: {id : id},
+                success: function(result) {
+                    if(result.status == "ok"){
+                        console.log('Đã bỏ quan tâm phòng trọ ' + id);
+                        $('#isQuanTamPhongTro' + id).html('Quan tâm');
+                    }      
+                },
+                error: function(err){
+                    console.log(err);
+                }
+            });       
+        }
+    }
 </script>
