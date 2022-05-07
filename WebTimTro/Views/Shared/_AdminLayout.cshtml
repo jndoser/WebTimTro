@@ -28,7 +28,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Admin Page - Blog Management</title>
+    <title>Admin Page - Web tìm trọ</title>
 
     <meta name="description" content="" />
 
@@ -131,7 +131,7 @@
                   </g>
                 </svg>
               </span>
-              <span class="app-brand-text demo menu-text fw-bolder ms-2">Admin Zone</span>
+              <span class="app-brand-text demo menu-text fw-bolder ms-2">WTT</span>
             </a>
 
             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -143,10 +143,10 @@
 
           <ul class="menu-inner py-1">
             <!-- Dashboard -->
-            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Category") ? "active" : "")">
-              <a asp-controller="Category" asp-action="Index" class="menu-link">
+            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("DichVu") ? "active" : "")">
+              <a asp-controller="DichVu" asp-action="Index" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-category"></i>
-                <div data-i18n="Analytics">Category</div>
+                <div data-i18n="Analytics">Dịch vụ</div>
               </a>
             </li>
 
@@ -155,25 +155,32 @@
 
             
             <!-- Cards -->
-            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("PostManager") ? "active" : "") ">
-              <a asp-controller="PostManager" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-book"></i>
-                <div data-i18n="Basic">Post Manager</div>
+            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("NguoiDung") ? "active" : "") ">
+              <a asp-controller="NguoiDung" asp-action="Index" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user"></i>
+                <div data-i18n="Basic">Người dùng</div>
               </a>
             </li>
            
 
-            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("UserManager") ? "active" : "")">
-              <a asp-controller="UserManager" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-user"></i>
-                <div data-i18n="Boxicons">User Manager</div>
+            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("ChuTro") ? "active" : "")">
+              <a asp-controller="ChuTro" asp-action="Index" class="menu-link">
+                <i class='menu-icon tf-icons bx bxs-user-detail'></i>
+                <div data-i18n="Boxicons">Chủ trọ</div>
               </a>
             </li>
 
-            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("ReportComment") ? "active" : "")">
-              <a asp-controller="ReportComment" asp-action="Index" class="menu-link">
+            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("PhongTro") ? "active" : "")">
+              <a asp-controller="PhongTro" asp-action="Index" class="menu-link">
+                <i class='menu-icon tf-icons bx bx-building-house' ></i>
+                <div data-i18n="Boxicons">Phòng trọ</div>
+              </a>
+            </li>
+
+            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("ReportedBinhLuan") ? "active" : "")">
+              <a asp-controller="ReportedBinhLuan" asp-action="Index" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-no-entry"></i>
-                <div data-i18n="Boxicons">Reported Comment</div>
+                <div data-i18n="Boxicons">Duyệt bình luận báo cáo</div>
               </a>
             </li>
           </ul>

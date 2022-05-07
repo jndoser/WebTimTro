@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using WebTimTro.Data;
 
 namespace WebTimTro.Configurations
@@ -8,6 +9,12 @@ namespace WebTimTro.Configurations
     {
         public void Configure(EntityTypeBuilder<BinhLuan> builder)
         {
+            builder.Property(x => x.IsReported)
+                .HasDefaultValue(false);
+
+            builder.Property(x => x.IsShow)
+                .HasDefaultValue(true);
+
             // Set relationship giữa bình luận con
             // và bình luận cha
             builder.HasOne(x => x.BinhLuanCha)

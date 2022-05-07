@@ -23,6 +23,10 @@ namespace WebTimTro.Mapping
             CreateMap<DichVu, DichVuVM>().ReverseMap();
 
             CreateMap<HinhAnh, HinhAnhVM>().ReverseMap();
+            CreateMap<BinhLuan, BinhLuanVM>().ReverseMap();
+            CreateMap<BinhLuan, ReportedBinhLuanVM>()
+                .ForMember(dest => dest.TenCuaNguoiDang, act => act.Ignore())
+                .ReverseMap();
         }
     }
 }

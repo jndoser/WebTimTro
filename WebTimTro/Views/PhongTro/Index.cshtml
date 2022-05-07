@@ -4,8 +4,13 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="card">
-    <h5 class="card-header">Danh sách các bài viết về phòng trọ</h5>
+<div class="card" style="margin-left: 50px; margin-right: 50px; margin-top: 30px;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Danh sách các bài viết về phòng trọ</h5>
+        <a class="text-muted float-end" href="/PhongTro/Create">Thêm phòng trọ</a>
+    </div>
+    @*<h5 class="card-header">Danh sách các bài viết về phòng trọ</h5>
+    <small class="text-muted float-end" style="cursor: pointer;" href="/PhongTro/Create">Thêm phòng trọ</small>*@
     <div class="table-responsive text-nowrap">
         <table class="table">
             <thead>
@@ -176,7 +181,7 @@
                         if(pageCurrent > 0 && pageCurrent < numSize){
                             var pageNext = pageCurrent + 1;
                             pagination_string += '<li class="page-item">';
-                            pagination_string += '<a class="page-link" href="" data-page="'+ pageNext +'">Previous</a>';
+                            pagination_string += '<a class="page-link" href="" data-page="'+ pageNext +'">Next</a>';
                             pagination_string += '</li>';
                         }
 

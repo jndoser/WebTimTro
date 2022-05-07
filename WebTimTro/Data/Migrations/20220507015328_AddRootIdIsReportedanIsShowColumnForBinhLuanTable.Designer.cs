@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebTimTro.Data;
 
 namespace WebTimTro.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220507015328_AddRootIdIsReportedanIsShowColumnForBinhLuanTable")]
+    partial class AddRootIdIsReportedanIsShowColumnForBinhLuanTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,21 +51,21 @@ namespace WebTimTro.Data.Migrations
                         new
                         {
                             Id = "admin",
-                            ConcurrencyStamp = "2869eb5f-3f86-4df4-9932-d08bb189e2ae",
+                            ConcurrencyStamp = "7663596f-5d47-497a-afca-6148820571b3",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "nguoidung",
-                            ConcurrencyStamp = "6fb4ba46-6e03-4729-9c17-ad6af94085c0",
+                            ConcurrencyStamp = "2ff0e8e6-2c25-4800-8754-6b0df2556e0e",
                             Name = "Nguoidung",
                             NormalizedName = "NGUOIDUNG"
                         },
                         new
                         {
                             Id = "chutro",
-                            ConcurrencyStamp = "4833d54d-5586-47e6-9c92-91166ad43711",
+                            ConcurrencyStamp = "3c1111b4-4ef8-4077-8198-ba12b0dc30e1",
                             Name = "Chutro",
                             NormalizedName = "CHUTRO"
                         });
@@ -203,14 +205,14 @@ namespace WebTimTro.Data.Migrations
                     b.Property<string>("NoiDung")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ParentId")
+                    b.Property<int>("ParentId")
                         .HasColumnType("int");
 
                     b.Property<int>("PhongTroId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RootId")
-                        .HasColumnType("int");
+                    b.Property<long>("RootId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("SoLuotLike")
                         .HasColumnType("int");
@@ -579,7 +581,8 @@ namespace WebTimTro.Data.Migrations
                     b.HasOne("WebTimTro.Data.BinhLuan", "BinhLuanCha")
                         .WithMany("BinhLuanCons")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("WebTimTro.Data.PhongTro", "PhongTro")
                         .WithMany("BinhLuans")

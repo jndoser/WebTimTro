@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebTimTro.Data;
@@ -22,10 +23,45 @@ namespace WebTimTro.Controllers
 
         public IActionResult Index()
         {
-            List<DichVu> dichVus = _unitOfWork.DichVu.GetAll().ToList();
-            List<DichVuVM> dichVusVM = _mapper.Map<List<DichVuVM>>(dichVus);
+            //List<DichVu> dichVus = _unitOfWork.DichVu.GetAll().ToList();
+            //List<DichVuVM> dichVusVM = _mapper.Map<List<DichVuVM>>(dichVus);
 
-            return View(dichVusVM);
+            //return View(dichVusVM);
+            return View();
+        }
+
+        // Lấy các post đã được tạo, phân trang
+        [HttpGet]
+        public JsonResult GetAllDichVu(string txtSearch, int? page)
+        {
+            var data = _unitOfWork.DichVu.GetAll();
+            if (!string.IsNullOrEmpty(txtSearch))
+            {
+                ViewBag.txtSearch = txtSearch;
+                data = data.Where(x => x.Ten.Contains(txtSearch));
+            }
+            if (page > 0)
+            {
+
+            }
+            else
+            {
+                page = 1;
+            }
+            int start = (int)(page - 1) * 7; // 7 is pageSize
+            ViewBag.pageCurrent = page;
+            int totalPage = data.Count();
+            float totalNumsize = (totalPage / (float)7);
+            int numSize = (int)Math.Ceiling(totalNumsize);
+            ViewBag.numSize = numSize;
+            var dataDichVu = data.OrderBy(x => x.Id)
+                .Skip(start).Take(7);
+            List<DichVu> listDichVu = new List<DichVu>();
+            listDichVu = dataDichVu.ToList();
+            List<DichVuVM> listDichVuVM = _mapper
+                .Map<List<DichVuVM>>(listDichVu);
+
+            return Json(new { data = listDichVuVM, pageCurrent = page, numSize = numSize });
         }
 
         public JsonResult SaveDichVu(DichVuVM dichVu)
