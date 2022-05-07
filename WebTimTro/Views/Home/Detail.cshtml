@@ -103,4 +103,359 @@
             </div>
         </div>
     </div>
+    <div class="card mb-4 col-7">
+        <!--Đây là phần bình luận bài viết-->
+        <div class="container mt-5">
+            <div class="d-flex justify-content-center row">
+                <div class="col-md-8">
+                    <div class="d-flex flex-column comment-section">
+                        <!--Nơi viết comment-->
+                        <form method="post">
+                            <div class="bg-light p-2">
+                                <div class="d-flex flex-row align-items-start">
+                                    <img class="rounded-circle" src="~/images/@@loggedUserAvatar" width="40">
+                                    @*<textarea id="commentOnPost" class="form-control ml-1 shadow-none textarea">
+                                    </textarea>*@
+                                    <textarea class="form-control" id="commentOnPost" rows="3"></textarea>
+                                </div>
+                                <div class="row" style="margin-left:20px;margin-top:5px;">
+                                    <div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnPost()">post it</div>
+                                    <div class="col-lg-5" style="cursor:pointer;" onclick="CancelComment()">cancel</div>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="listComment">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
 </div>
+
+<script>
+    $(document).ready(LoadComments());
+
+    function LoadComments(){
+        var postId = @Model.Id;
+        $.ajax(
+        {
+        url: "/Home/LoadComments",
+        dataType: 'json',
+        type: 'post',
+        data: {postId: postId},
+        success: function(res){
+            var contents = "";
+            $.each(res.listComment, function(index, element){
+                // Change create At to nicer formata
+                var d = new Date(element.ngayDang);
+                var timeCreate = d.toLocaleString("en-US");
+
+                // Generate id for reply section
+                var replyId = "reply" + element.id;
+
+                contents += '<div class="bg-white p-2">';
+                contents += '<div class="d-flex flex-row user-info">';
+                contents += '<img class="rounded-circle" src="/images/'+ res.listAvatar[index] +'" width="40">';
+                contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">'+ res.listAuthorName[index] +'</span><span class="date text-black-50">Shared publicly - '+ timeCreate +'</span></div>';
+                contents +=  '</div>';
+                contents +=  '<div class="mt-2">';
+                contents +=  '<p class="comment-text">' + element.noiDung + '</p>';
+                contents +=  '</div>';
+                contents +=  '</div>';
+                contents +=  '<div class="bg-white">';
+                contents +=  '<div class="d-flex flex-row fs-12">';
+                contents +=  '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                contents +=  '<div onclick="ShowHideReply(' + element.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                contents += '<div onclick="ReportThisComment(' + element.id +')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
+
+                contents +=  '</div>';
+
+                // List all reply comment relate to this comment
+                contents += '<div style="margin-left:50px;" id= ' + ("listreplyto" + element.id) + '></div>';
+
+                // Add reply comment section
+                contents +=  '<div id=' + replyId +' style="display:none;">';
+
+                // Nơi viết comment
+                contents +=  '<form method="post">';
+                contents +=  '<div class="bg-light p-2">';
+                contents +=  '<div class="d-flex flex-row align-items-start">';
+                contents +=  '<img class="rounded-circle" src="/images/'+ res.loggedUserAvatar +'" width="40">';
+                contents +=  '<textarea id='+ ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
+                contents +=   '</textarea>';
+                contents +=   '</div>';
+                contents +=   '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                contents +=   '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">post it</div>';
+                contents +=   '<div class="col-lg-5">Cancel</div></div>';
+                contents +=   '</div>';
+                contents +=   '</form>';
+
+
+                contents +=  '</div>';
+            });
+
+            $('#listComment').html(contents);
+
+            console.log(res);
+        },
+        error: function(err){
+            console.log(err);
+        }
+        });
+    }
+
+    function LoadSubComments(id){
+        var parentCommentId = id;
+        $.ajax(
+        {
+        url: "/Home/LoadSubCommentsByParentCommentId",
+        dataType: 'json',
+        type: 'post',
+        data: {id: parentCommentId},
+        success: function(res){
+            var replyUsers = res.replyUser;
+            var contents = "";
+            $.each(res.result, function(index, element){
+                // Change create At to nicer formata
+                var d = new Date(element.ngayDang);
+                var timeCreate = d.toLocaleString("en-US");
+
+                // Generate id for reply section
+                var replyId = "reply" + element.id;
+
+                contents += '<div class="bg-white p-2" style="backgroud-color: gray;">';
+                contents += '<div class="d-flex flex-row user-info">';
+                contents += '<img class="rounded-circle" src="/images/'+ res.listAvatar[index] +'" width="40">';
+                contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">'+ res.listAuthorName[index] +'</span><span class="date text-black-50">Shared publicly - '+ timeCreate +'</span></div>';
+                contents +=  '</div>';
+                contents +=  '<div class="mt-2">';
+                contents +=  '<p class="comment-text">' + '@@' + replyUsers[index] + ' - '  + element.noiDung + '</p>';
+                contents +=  '</div>';
+                contents +=  '</div>';
+                contents +=  '<div class="bg-white">';
+                contents +=  '<div class="d-flex flex-row fs-12">';
+                contents +=  '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                contents +=  '<div onclick="ShowHideReply(' + element.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                contents += '<div onclick="ReportThisComment(' + element.id +')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
+
+                contents +=  '</div>';
+
+
+                // Add reply comment section
+                contents +=  '<div id=' + replyId +' style="display: none;">';
+
+                // Nơi viết comment
+                contents +=  '<form method="post">';
+                contents +=  '<div class="bg-light p-2">';
+                contents +=  '<div class="d-flex flex-row align-items-start">';
+                contents +=  '<img class="rounded-circle" src="/images/'+ res.loggedUserAvatar +'" width="40">';
+                contents +=  '<textarea id='+ ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
+                contents +=   '</textarea>';
+                contents +=   '</div>';
+                contents +=   '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                contents +=   '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">post it</div>';
+                contents +=   '<div class="col-lg-5">Cancel</div></div>';
+                contents +=   '</div>';
+                contents +=   '</form>';
+
+
+                contents +=  '</div>';
+            });
+
+            $('#listreplyto' + id).html(contents);
+
+            console.log('subcomment of comment: ' + id);
+            console.log(res);
+        },
+        error: function(err){
+            console.log(err);
+        }
+        });
+    }
+
+    function ShowHideReply(id){
+        LoadSubComments(id);
+
+        var x = document.getElementById("reply" + id);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+    function PostCommentOnPost(){
+            var postId = @Model.Id;
+            var content = $("#commentOnPost").val();
+
+            $.ajax(
+            {
+            url: "/Home/SaveCommentOnPost",
+            dataType: 'json',
+            type: 'post',
+            data: {postId: postId, content: content},
+            success: function(res){
+                if(res.status == "ok"){
+                    console.log("ok");
+                    var newComment = res.result;
+                    console.log(newComment);
+                    var contents = "";
+
+                    // Change create At to nicer formata
+                    var d = new Date(newComment.ngayDang);
+                    var timeCreate = d.toLocaleString("en-US");
+
+                    // Generate id for reply section
+                    var replyId = "reply" + newComment.id;
+
+                    contents += '<div class="bg-white p-2">';
+                    contents += '<div class="d-flex flex-row user-info">';
+                    contents += '<img class="rounded-circle" src="/images/'+ res.avatarOfUserWriteThisComment +'" width="40">';
+                    contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">'+ res.nameOfUserWriteThisComment +'</span><span class="date text-black-50">Shared publicly - '+ timeCreate +'</span></div>';
+                    contents +=  '</div>';
+                    contents +=  '<div class="mt-2">';
+                    contents +=  '<p class="comment-text">' + newComment.noiDung + '</p>';
+                    contents +=  '</div>';
+                    contents +=  '</div>';
+                    contents +=  '<div class="bg-white">';
+                    contents +=  '<div class="d-flex flex-row fs-12">';
+                    contents +=  '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                    contents +=  '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                    contents += '<div onclick="ReportThisComment(' + newComment.id +')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
+
+                    contents +=  '</div>';
+
+                    // List all reply comment relate to this comment
+                    contents += '<div style="margin-left: 50px;" id= ' + ("listreplyto" + newComment.id) + '></div>';
+
+                    // Add reply comment section
+                    contents +=  '<div id=' + replyId +' style="display: none;">';
+
+                    // Nơi viết comment
+                    contents +=  '<form method="post">';
+                    contents +=  '<div class="bg-light p-2">';
+                    contents +=  '<div class="d-flex flex-row align-items-start">';
+                    contents +=  '<img class="rounded-circle" src="/images/'+ res.loggedUserAvatar +'" width="40">';
+                    contents +=  '<textarea id='+ ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
+                    contents +=   '</textarea>';
+                    contents +=   '</div>';
+                    contents +=   '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                    contents +=   '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
+                    contents +=   '<div class="col-lg-5">Cancel</div></div>';
+                    contents +=   '</div>';
+                    contents +=   '</form>';
+
+
+                    contents +=  '</div>';
+
+                    $('#commentOnPost').val("");
+                    $('#listComment').append(contents);
+                }else {
+                    console.log("err");
+                }
+            },
+            error: function(err){
+                console.log(err);
+            }
+            });
+    }
+
+
+    function PostCommentOnComment(id){
+        var postId = @Model.Id;
+        var content = $('#commentOnComment' + id).val();
+
+        $.ajax(
+            {
+            url: "/Home/SaveCommentOnComment",
+            dataType: 'json',
+            type: 'post',
+            data: {postId: postId, content: content, parentCmtId: id},
+            success: function(res){
+                if(res.status == "ok"){
+                    console.log("ok");
+                    var newComment = res.result;
+                    // Get user that this comment reply to
+                    var userReply = res.replyUserName;
+                    // Get rootId of this comment
+                    var rootId = res.rootId;
+
+                    console.log(newComment);
+                    var contents = "";
+
+                    // Change create At to nicer formata
+                    var d = new Date(newComment.ngayDang);
+                    var timeCreate = d.toLocaleString("en-US");
+
+                    // Generate id for reply section
+                    var replyId = "reply" + newComment.id;
+
+                    contents += '<div class="bg-white p-2">';
+                    contents += '<div class="d-flex flex-row user-info">';
+                    contents += '<img class="rounded-circle" src="/images/'+ res.avatarOfUserWriteThisComment +'" width="40">';
+                    contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">'+ res.nameOfUserWriteThisComment +'</span><span class="date text-black-50">Shared publicly - '+ timeCreate +'</span></div>';
+                    contents +=  '</div>';
+                    contents +=  '<div class="mt-2">';
+                    contents +=  '<p class="comment-text">' + '@@' + userReply + ' - '  + newComment.noiDung + '</p>';
+                    contents +=  '</div>';
+                    contents +=  '</div>';
+                    contents +=  '<div class="bg-white">';
+                    contents +=  '<div class="d-flex flex-row fs-12">';
+                    contents +=  '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                    contents +=  '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                    contents +=  '<div style="cursor: pointer;" onclick="ReportThisComment(' + newComment.id +')" class="like p-2 cursor"><i class="fa fa-share"></i><span class="ml-1">Report</span></div>';
+
+                    contents +=  '</div>';
+
+                    // Add reply comment section
+                    contents +=  '<div id=' + replyId +' style="display: none;">';
+
+                    // Nơi viết comment
+                    contents +=  '<form method="post">';
+                    contents +=  '<div class="bg-light p-2">';
+                    contents +=  '<div class="d-flex flex-row align-items-start">';
+                    contents +=  '<img class="rounded-circle" src="/images/'+ res.loggedUserAvatar +'" width="40">';
+                    contents +=  '<textarea id='+ ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
+                    contents +=   '</textarea>';
+                    contents +=   '</div>';
+                    contents +=   '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                    contents +=   '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
+                    contents +=   '<div class="col-lg-5">Cancel</div></div>';
+                    contents +=   '</div>';
+                    contents +=   '</form>';
+
+
+                    contents +=  '</div>';
+
+                    $('#commentOnComment' + id).val("");
+                    $('#listreplyto' + rootId).append(contents);
+                }else {
+                    console.log("err");
+                }
+            },
+            error: function(err){
+                console.log(err);
+            }
+            });
+    }
+
+    function ReportThisComment(id) {
+        var parentCommentId = id;
+        $.ajax(
+            {
+                url: "/Home/ReportCommentById",
+                dataType: 'json',
+                type: 'post',
+                data: { id: parentCommentId },
+                success: function (res) {
+                    console.log(res);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+</script>

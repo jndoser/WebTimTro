@@ -24,41 +24,42 @@
                                     <th>Icon</th>
                                     <th>Action</th>
                                 </tr>
-                                </thead>
-                                <tbody class="table-border-bottom-0" id="listDichVu">
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr id="rowDichVu_@item.Id">
-                                            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>@item.Id</strong></td>
-                                            <td id="tenDichVu_@item.Id">@item.Ten</td>
-                                            <td>
-                                                <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
-                                                    <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="Lilian Fuller">
-                                                        <img src="../assets/img/avatars/5.png" alt="Avatar" class="rounded-circle">
-                                                    </li>
-                                                    @*<li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="Sophia Wilkerson">
-                                                        <img src="../assets/img/avatars/6.png" alt="Avatar" class="rounded-circle">
-                                                    </li>
-                                                    <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="Christina Parker">
-                                                        <img src="../assets/img/avatars/7.png" alt="Avatar" class="rounded-circle">
-                                                    </li>*@
-                                                </ul>
-                                            </td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                        <i class="bx bx-dots-vertical-rounded"></i>
-                                                    </button>
-                                                    <div class="dropdown-menu">
-                                                        <a class="dropdown-item" onclick="UpdateDichVu(@item.Id)"><i class="bx bx-edit-alt me-1"></i> Edit</a>
-                                                        <a class="dropdown-item" onclick="DeleteDichVu(@item.Id)"><i class="bx bx-trash me-1"></i> Delete</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
+                            </thead>
+                            <tbody class="load-list">
+                            </tbody>
                         </table>
+                        <div class="demo-inline-spacing" style="margin-left:5px;">
+                            <!-- Basic Pagination -->
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination" id="load-pagination">
+                                    @*<li class="page-item first">
+                                        <a class="page-link" href="javascript:void(0);"><i class="tf-icon bx bx-chevrons-left"></i></a>
+                                        </li>
+                                        <li class="page-item prev">
+                                        <a class="page-link" href="javascript:void(0);"><i class="tf-icon bx bx-chevron-left"></i></a>
+                                        </li>
+                                        <li class="page-item">
+                                        <a class="page-link" href="javascript:void(0);">1</a>
+                                        </li>
+                                        <li class="page-item active">
+                                        <a class="page-link" href="javascript:void(0);">3</a>
+                                        </li>
+                                        <li class="page-item">
+                                        <a class="page-link" href="javascript:void(0);">4</a>
+                                        </li>
+                                        <li class="page-item">
+                                        <a class="page-link" href="javascript:void(0);">5</a>
+                                        </li>
+                                        <li class="page-item next">
+                                        <a class="page-link" href="javascript:void(0);"><i class="tf-icon bx bx-chevron-right"></i></a>
+                                        </li>
+                                        <li class="page-item last">
+                                        <a class="page-link" href="javascript:void(0);"><i class="tf-icon bx bx-chevrons-right"></i></a>
+                                        </li>*@
+                                </ul>
+                            </nav>
+                            <!--/ Basic Pagination -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,20 +78,20 @@
                         <div class="input-group input-group-merge">
                             <span id="basic-icon-default-fullname2" class="input-group-text"><i class="bx bx-info-circle"></i></span>
                             <input type="text" class="form-control" id="tenDichVu" placeholder="Tên dịch vụ phòng trọ cung cấp"
-                            aria-label="John Doe" aria-describedby="basic-icon-default-fullname2">
+                                   aria-label="John Doe" aria-describedby="basic-icon-default-fullname2">
                         </div>
                     </div>
                     <input id="dichVuId" hidden />
                     @*<div class="mb-3">
                         <label class="form-label" for="basic-icon-default-company">Icon dịch vụ</label>
                         <div class="input-group input-group-merge">
-                            <span id="basic-icon-default-company2" class="input-group-text"><i class="bx bx-buildings"></i></span>
-                            <input type="text" id="basic-icon-default-company" class="form-control" placeholder="ACME Inc." aria-label="ACME Inc." aria-describedby="basic-icon-default-company2">
+                        <span id="basic-icon-default-company2" class="input-group-text"><i class="bx bx-buildings"></i></span>
+                        <input type="text" id="basic-icon-default-company" class="form-control" placeholder="ACME Inc." aria-label="ACME Inc." aria-describedby="basic-icon-default-company2">
                         </div>
-                    </div>*@
+                        </div>*@
                     <input id="createUpdateButton"
-                    type="button" class="btn btn-primary"
-                    onclick="SaveDichVu()" value="Save">
+                           type="button" class="btn btn-primary"
+                           onclick="SaveDichVu()" value="Save">
                 </form>
             </div>
         </div>
@@ -98,70 +99,220 @@
 </div>
 
 <script>
-function SaveDichVu() {
-    var saveOrUpdate = $('#createUpdateButton').val();
-    if(saveOrUpdate == "Save") {
-        var tenDichVu = $('#tenDichVu').val();
-    const dichVu = {
-        ten: tenDichVu
-    };
-    console.log('creating ' + tenDichVu);
-    
-    $.ajax({
-        url: '/DichVu/SaveDichVu',
-        method: 'post',
-        data: {dichVu: dichVu},
-        success: function(result){
-            if(result.status == "ok"){
-                console.log('created ' + tenDichVu);
-                console.log(result.data);
+    $(function(){
+        // function load pagination
+        var load = function(txtSearch, page) {
+            $.ajax({
+                url: '/DichVu/GetAllDichVu',
+                type: 'get',
+                data: {txtSearch: txtSearch, page: page},
+                success: function(result){
+                    console.log(result);
+                    var str = "";
+                    $.each(result.data, function(index, value){
+                        
+                        // Create list dichVu
+                        //str += '<tr id="row'+ value.id +'">';
+                        //str += "<td>"+(value.id)+"</td>";
+                        //str += "<td>"+value.ten + "</td>";
+                        //str += "<td>" + value.icon + "</td>";
+                        //str += "<td>";
+                        //str += '<div class="dropdown">';
+                        //str += '<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">';
+                        //str += '<i class="bx bx-dots-vertical-rounded"></i>';
+                        //str += '</button>';
+                        //str += '<div class="dropdown-menu">';
+                        //str += '<a class="dropdown-item" onclick="UpdateDichVu(' + value.id +')"><i class="bx bx-edit-alt me-1"></i> Edit</a>';
+                        //str += '<a class="dropdown-item" onclick="DeleteDichVu(' + value.id + ')"><i class="bx bx-trash me-1"></i> Delete</a>';
+                        //str += '</div>';
+                        //str += '</div>';
+                        //str += '</td>';
+                        //str += "</tr>";
 
-                var str = '';
-                str += '<tr id="rowDichVu_'+ result.data.id +'">';
-                str += '<td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>'+ result.data.id +'</strong></td>';
-                str += '<td id="tenDichVu_'+ result.data.id +'">'+ result.data.ten +'</td>';
-                str += '<td>';
-                str += '<ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">';
-                str += '<li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="Lilian Fuller">';
-                str += '<img src="../assets/img/avatars/5.png" alt="Avatar" class="rounded-circle">';
-                str += '</li>';
-                str += '</ul>';
-                str += '</td>';
-                str += '<td>';
-                str += '<div class="dropdown">';
-                str += '<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">';
-                str += '<i class="bx bx-dots-vertical-rounded"></i>';
-                str += '</button>';
-                str += '<div class="dropdown-menu">';
-                str += '<a class="dropdown-item" onclick="UpdateDichVu('+ result.data.id +')"><i class="bx bx-edit-alt me-1"></i> Edit</a>';
-                str += '<a class="dropdown-item" onclick="DeleteDichVu('+ result.data.id +')"><i class="bx bx-trash me-1"></i> Delete</a>';
-                str += '</div>';
-                str += '</div>';
-                str += '</td>';
-                str += '</tr>';
+                        str += '<tr id="rowDichVu_'+ value.id +'">';
+                        str += '<td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>'+ value.id +'</strong></td>';
+                        str += '<td id="tenDichVu_'+ value.id +'">'+ value.ten +'</td>';
+                        str += '<td>';
+                        str += '<ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">';
+                        str += '<li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="Lilian Fuller">';
+                        str += '<img src="../assets/img/avatars/5.png" alt="Avatar" class="rounded-circle">';
+                        str += '</li>';
+                        str += '</ul>';
+                        str += '</td>';
+                        str += '<td>';
+                        str += '<div class="dropdown">';
+                        str += '<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">';
+                        str += '<i class="bx bx-dots-vertical-rounded"></i>';
+                        str += '</button>';
+                        str += '<div class="dropdown-menu">';
+                        str += '<a class="dropdown-item" onclick="UpdateDichVu('+ value.id +')"><i class="bx bx-edit-alt me-1"></i> Edit</a>';
+                        str += '<a class="dropdown-item" onclick="DeleteDichVu('+ value.id +')"><i class="bx bx-trash me-1"></i> Delete</a>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '</td>';
+                        str += '</tr>';
 
-                $('#listDichVu').append(str);
-            }
-        },
-        error: function(err){
-            console.log(err);
+                        // Create pagination
+                        var pagination_string = "";
+                        var pageCurrent = result.pageCurrent;
+                        var numSize = result.numSize;
+
+                        // Create button previous
+                        if(pageCurrent > 1){
+                            var pagePrevious = pageCurrent - 1;
+                            pagination_string += '<li class="page-item">';
+                            pagination_string += '<a class="page-link" href="" data-page="'+ pagePrevious +'">Previous</a>';
+                            pagination_string += '</li>';
+                        }
+
+                        for(var i = 1; i <= numSize; i++){
+                            if(i == pageCurrent) {
+                                pagination_string += '<li class="page-item active">';
+                                pagination_string += '<a class="page-link" href="" data-page="'+ i +'">'+ pageCurrent +'</a>';
+                                pagination_string += '</li>';
+                            } else {
+                                pagination_string += '<li class="page-item">';
+                                pagination_string += '<a class="page-link" href="" data-page="'+ i +'">'+ i +'</a>';
+                                pagination_string += '</li>';
+                            }
+                        }
+
+                        // Create button next
+                        if(pageCurrent > 0 && pageCurrent < numSize){
+                            var pageNext = pageCurrent + 1;
+                            pagination_string += '<li class="page-item">';
+                            pagination_string += '<a class="page-link" href="" data-page="'+ pageNext +'">Next</a>';
+                            pagination_string += '</li>';
+                        }
+
+                        // Load pagination
+                        $("#load-pagination").html(pagination_string);
+                    });
+
+                    // Load str to class="load-list"
+                    $(".load-list").html(str);
+                }
+            });
         }
-    });
-    } else {
-        var id = $('#dichVuId').val();
-        var tenDichVu = $('#tenDichVu').val();
+
+        
+
+        // Click event pagination
+        $("body").on("click", ".pagination li a", function(event) {
+            event.preventDefault();
+            var page = $(this).attr('data-page');
+
+            // Load event pagination
+            var txtSearch = $('.txtSearch').val();
+            if(txtSearch != ""){
+                load(txtSearch, page);
+            }else {
+                load(null, page);
+            }
+        });
+
+        // Click event search
+        //$('#search').click(function() {
+        //    var txtSearch = $('.txtSearch').val();
+        //    if(txtSearch != ''){
+        //        load(txtSearch, 1);
+        //    } else {
+        //        load(null, 1);
+        //        }
+        //    });
+        //});
+
+        // Load init
+        load(null, 1);
+     });
+
+    function SaveDichVu() {
+        var saveOrUpdate = $('#createUpdateButton').val();
+        if(saveOrUpdate == "Save") {
+            var tenDichVu = $('#tenDichVu').val();
         const dichVu = {
-            id: id,
             ten: tenDichVu
         };
+        console.log('creating ' + tenDichVu);
 
         $.ajax({
-            url: '/DichVu/UpdateDichVu',
+            url: '/DichVu/SaveDichVu',
             method: 'post',
             data: {dichVu: dichVu},
             success: function(result){
                 if(result.status == "ok"){
-                    $('#tenDichVu_' + id).html(tenDichVu);
+                    console.log('created ' + tenDichVu);
+                    console.log(result.data);
+
+                    var str = '';
+                    str += '<tr id="rowDichVu_'+ result.data.id +'">';
+                    str += '<td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>'+ result.data.id +'</strong></td>';
+                    str += '<td id="tenDichVu_'+ result.data.id +'">'+ result.data.ten +'</td>';
+                    str += '<td>';
+                    str += '<ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">';
+                    str += '<li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-xs pull-up" title="" data-bs-original-title="Lilian Fuller">';
+                    str += '<img src="../assets/img/avatars/5.png" alt="Avatar" class="rounded-circle">';
+                    str += '</li>';
+                    str += '</ul>';
+                    str += '</td>';
+                    str += '<td>';
+                    str += '<div class="dropdown">';
+                    str += '<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">';
+                    str += '<i class="bx bx-dots-vertical-rounded"></i>';
+                    str += '</button>';
+                    str += '<div class="dropdown-menu">';
+                    str += '<a class="dropdown-item" onclick="UpdateDichVu('+ result.data.id +')"><i class="bx bx-edit-alt me-1"></i> Edit</a>';
+                    str += '<a class="dropdown-item" onclick="DeleteDichVu('+ result.data.id +')"><i class="bx bx-trash me-1"></i> Delete</a>';
+                    str += '</div>';
+                    str += '</div>';
+                    str += '</td>';
+                    str += '</tr>';
+
+                    //$('#listDichVu').append(str);
+                    $('.load-list').append(str);          
+                }
+            },
+            error: function(err){
+                console.log(err);
+            }
+        });
+        } else {
+            var id = $('#dichVuId').val();
+            var tenDichVu = $('#tenDichVu').val();
+            const dichVu = {
+                id: id,
+                ten: tenDichVu
+            };
+
+            $.ajax({
+                url: '/DichVu/UpdateDichVu',
+                method: 'post',
+                data: {dichVu: dichVu},
+                success: function(result){
+                    if(result.status == "ok"){
+                        $('#tenDichVu_' + id).html(tenDichVu);
+                    }
+                },
+                error: function(err){
+                    console.log(err);
+                }
+            });
+        }
+    }
+
+    function UpdateDichVu(id) {
+        $('#createUpdateTitle').html('Cập nhật dịch vụ');
+        $('#createUpdateButton').val('Update');
+        console.log('updating dich vu ' + id);
+
+        $.ajax({
+            url: '/DichVu/GetDichVuById',
+            method: 'post',
+            data: {id: id},
+            success: function(result){
+                if(result.status == "ok"){
+                    $('#tenDichVu').val(result.data.ten);
+                    $('#dichVuId').val(result.data.id);
                 }
             },
             error: function(err){
@@ -169,47 +320,25 @@ function SaveDichVu() {
             }
         });
     }
-}
 
-function UpdateDichVu(id) {
-    $('#createUpdateTitle').html('Cập nhật dịch vụ');
-    $('#createUpdateButton').val('Update');
-    console.log('updating dich vu ' + id);
+    function ChangeToCreate(){
+        $('#createUpdateTitle').html('Tạo mới dịch vụ');
+        $('#createUpdateButton').val('Save');
+    }
 
-    $.ajax({
-        url: '/DichVu/GetDichVuById',
-        method: 'post',
-        data: {id: id},
-        success: function(result){
-            if(result.status == "ok"){
-                $('#tenDichVu').val(result.data.ten);
-                $('#dichVuId').val(result.data.id);
+    function DeleteDichVu(id){
+        $.ajax({
+            url: '/DichVu/DeleteDichVuById',
+            method: 'post',
+            data: {id: id},
+            success: function(result){
+                if(result.status == "ok"){
+                    $('#rowDichVu_' + id).hide();
+                }
+            },
+            error: function(err){
+                console.log(err);
             }
-        },
-        error: function(err){
-            console.log(err);
-        }
-    });
-}
-
-function ChangeToCreate(){
-    $('#createUpdateTitle').html('Tạo mới dịch vụ');
-    $('#createUpdateButton').val('Save');
-}
-
-function DeleteDichVu(id){
-    $.ajax({
-        url: '/DichVu/DeleteDichVuById',
-        method: 'post',
-        data: {id: id},
-        success: function(result){
-            if(result.status == "ok"){
-                $('#rowDichVu_' + id).hide();
-            }
-        },
-        error: function(err){
-            console.log(err);
-        }
-    });
-}
+        });
+    }
 </script>
