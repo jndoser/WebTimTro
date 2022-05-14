@@ -28,23 +28,101 @@ namespace WebTimTro.Controllers
 
         public IActionResult Index()
         {
-            // Lấy thông tin tất cả các bài viết trong phòng trọ
-            IEnumerable<PhongTro> phongTros = _unitOfWork.PhongTro.GetAll();
-            IEnumerable<PhongTroVM> phongTroVMs = _mapper
-                .Map<IEnumerable<PhongTroVM>>(phongTros);
+            //// Lấy thông tin tất cả các bài viết trong phòng trọ
+            //IEnumerable<PhongTro> phongTros = _unitOfWork.PhongTro.GetAll();
+            //IEnumerable<PhongTroVM> phongTroVMs = _mapper
+            //    .Map<IEnumerable<PhongTroVM>>(phongTros);
+
+            //// Lấy tất cả các hình ảnh đầu tiên tương ứng với tất cả
+            //// các phòng trọ ở trên
+            //List<string> firstHinhAnhs = _unitOfWork.HinhAnh.GetFirstHinhAnhListOfPhongTroList();
+            //ViewBag.FirstHinhAnhs = firstHinhAnhs;
+
+            //// Lấy các dịch vụ tương ứng với tất cả các phòng trọ ở trên
+            //List<string> someDichVu = _unitOfWork.DichVu.GetSomeDichVuOfPhongTroList();
+            //ViewBag.SomeDichVu = someDichVu;
+
+            //return View(phongTroVMs);
+            return View();
+        }
+
+        // Lấy các post đã được tạo, phân trang
+        [HttpGet]
+        public JsonResult GetAllPost(string txtSearch, int? page)
+        {
+            var data = _unitOfWork.PhongTro.GetAll();
+            if (!string.IsNullOrEmpty(txtSearch))
+            {
+                ViewBag.txtSearch = txtSearch;
+                data = data.Where(x => x.Ten.Contains(txtSearch));
+            }
+            if (page > 0)
+            {
+
+            }
+            else
+            {
+                page = 1;
+            }
+            int start = (int)(page - 1) * 7; // 7 is pageSize
+            ViewBag.pageCurrent = page;
+            int totalPage = data.Count();
+            float totalNumsize = (totalPage / (float)7);
+            int numSize = (int)Math.Ceiling(totalNumsize);
+            ViewBag.numSize = numSize;
+            var dataPost = data.OrderByDescending(x => x.Id)
+                .Skip(start).Take(7);
+            List<PhongTro> listPost = new List<PhongTro>();
+            listPost = dataPost.ToList();
+            List<PhongTroVM> listPostVM = _mapper
+                .Map<List<PhongTro>, List<PhongTroVM>>(listPost);
+
 
             // Lấy tất cả các hình ảnh đầu tiên tương ứng với tất cả
             // các phòng trọ ở trên
-            List<string> firstHinhAnhs = _unitOfWork.HinhAnh.GetFirstHinhAnhListOfPhongTroList();
-            ViewBag.FirstHinhAnhs = firstHinhAnhs;
+            IEnumerable<string> firstHinhAnhs = _unitOfWork.HinhAnh
+                .GetFirstHinhAnhListOfPhongTroList().Skip(start).Take(7);
+            List<string> firstHinhAnhList = firstHinhAnhs.ToList();
 
             // Lấy các dịch vụ tương ứng với tất cả các phòng trọ ở trên
-            List<string> someDichVu = _unitOfWork.DichVu.GetSomeDichVuOfPhongTroList();
-            ViewBag.SomeDichVu = someDichVu;
+            IEnumerable<string> someDichVu = _unitOfWork.DichVu
+                .GetSomeDichVuOfPhongTroList().Skip(start).Take(7);
+            List<string> someDichVuList = someDichVu.ToList();
 
-            return View(phongTroVMs);
+            // Kiểm tra xem các bài viết đã được quan tâm hay đã được người dùng lưu chưa
+            // và truyền sang phía giao diện
+            List<string> savedStatusList = new List<string>();
+            foreach(var phongTro in listPostVM)
+            {
+                if(_unitOfWork.PhongTroLuuTru.IsSaved(
+                    _unitOfWork.NguoiDung.GetUserId(), phongTro.Id))
+                {
+                    savedStatusList.Add("Đã lưu");
+                } else
+                {
+                    savedStatusList.Add("Lưu");
+                }
+            }
+
+            List<string> favStatusList = new List<string>();
+            foreach (var phongTro in listPostVM)
+            {
+                if (_unitOfWork.PhongTroQuanTam.IsQuanTam(
+                    _unitOfWork.NguoiDung.GetUserId(), phongTro.Id))
+                {
+                    favStatusList.Add("Đã quan tâm");
+                }
+                else
+                {
+                    favStatusList.Add("Quan tâm");
+                }
+            }
+
+            return Json(new { data = listPostVM, pageCurrent = page, numSize = numSize, 
+            firstHinhAnhs = firstHinhAnhList, someDichVu = someDichVuList, 
+            savedStatusList = savedStatusList, favStatusList = favStatusList});
         }
-        
+
         public IActionResult Detail(int id)
         {
             PhongTro phongTro = _unitOfWork.PhongTro.GetById(id);

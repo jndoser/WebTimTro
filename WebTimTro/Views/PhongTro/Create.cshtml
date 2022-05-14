@@ -78,7 +78,7 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-lg-6">
-                        <small class="text-light fw-semibold">Chọn dịch vụ mà phòng trọ bạn cung cấp</small>
+                        <small class="text-light fw-semibold">Chọn dịch vụ mà phòng trọ bạn cung cấp (bạn cũng có thể mô tả dịch vụ của mình trong phần mô tả)</small>
                         <div class="demo-inline-spacing mt-3">
                             <div class="list-group">
                                 @foreach (DichVuVM item in allDichVuVM)
@@ -198,7 +198,9 @@
                         data: {dichVu: val, phongTro: phongTro, ghiChu: ghiChu,
                             uploadedFilenames: uploadedFilenames},
                         success: function(res){
-
+                            if(res.status == "ok"){
+                                window.location.href = '/PhongTro/Index';
+                            }
                         },
                         error: function(err){
                             

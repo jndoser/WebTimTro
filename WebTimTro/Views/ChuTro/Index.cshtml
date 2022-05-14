@@ -23,49 +23,146 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody class="table-border-bottom-0">
-                @foreach (var item in Model) {
-                <tr>
-                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> 
-                    <strong>
-                        @Html.DisplayFor(modelItem => item.FirstName)
-                    </strong></td>
-                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> 
-                    <strong>
-                        @Html.DisplayFor(modelItem => item.MiddleName)
-                    </strong></td>
-                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> 
-                    <strong>
-                        @Html.DisplayFor(modelItem => item.LastName)
-                    </strong></td>
-                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> 
-                    <strong>
-                        @Html.DisplayFor(modelItem => item.Mobile)
-                    </strong></td>
-                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> 
-                    <strong>
-                        @Html.DisplayFor(modelItem => item.Intro)
-                    </strong></td>
-                    <td><i class="fab fa-angular fa-lg text-danger me-3"></i> 
-                    <strong>
-                        @Html.DisplayFor(modelItem => item.Profile)
-                    </strong></td>
-                    <td>
-                        <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                <i class="bx bx-dots-vertical-rounded"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">
-                                    <i class="bx bx-edit-alt me-1"></i> Edit | Detail</a>
-                                <a class="dropdown-item" asp-action="Delete" asp-route-id="@item.Id">
-                                <i class="bx bx-trash me-1"></i> Delete</a>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                }
+            <tbody class="table-border-bottom-0 load-list">
+               
             </tbody>
         </table>
+        <div class="demo-inline-spacing" style="margin-left:5px;">
+            <!-- Basic Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination" id="load-pagination">
+                    
+                </ul>
+            </nav>
+            <!--/ Basic Pagination -->
+        </div>
     </div>
 </div>
+
+<script>
+    $(function(){
+        // function load pagination
+        var load = function(txtSearch, page) {
+            $.ajax({
+                url: '/ChuTro/GetAllChuTro',
+                type: 'get',
+                data: {txtSearch: txtSearch, page: page},
+                success: function(result){
+                    console.log(result);
+                    var str = "";
+                    $.each(result.data, function(index, value){
+                        str += '<tr>';
+                        str += '<td><i class="fab fa-angular fa-lg text-danger me-3"></i>'; 
+                        str += '<strong>';
+                        str += value.firstName;
+                        str += '</strong></td>';
+                        str += '<td><i class="fab fa-angular fa-lg text-danger me-3"></i>'; 
+                        str += '<strong>'; 
+                        str += value.middleName;
+                        str += '</strong></td>';
+                        str += '<td><i class="fab fa-angular fa-lg text-danger me-3"></i>'; 
+                        str += '<strong>';
+                        str += value.lastName;
+                        str += '</strong></td>';
+                        str += '<td><i class="fab fa-angular fa-lg text-danger me-3"></i>'; 
+                        str += '<strong>';
+                        str += value.mobile;
+                        str += '</strong></td>'; 
+                        str += '<td><i class="fab fa-angular fa-lg text-danger me-3"></i>'; 
+                        str += '<strong>'; 
+                        str += value.intro;
+                        str += '</strong></td>';
+                        str += '<td><i class="fab fa-angular fa-lg text-danger me-3"></i>'; 
+                        str += '<strong>'; 
+                        str += value.profile;
+                        str += '</strong></td>'; 
+                        str += '<td>'; 
+                        str += '<div class="dropdown">';
+                        str += '<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">';
+                        str += '<i class="bx bx-dots-vertical-rounded"></i>';
+                        str += '</button>';
+                        str += '<div class="dropdown-menu">';
+                        str += '<a class="dropdown-item" href="/ChuTro/Edit/'+ value.id +'">';
+                        str += '<i class="bx bx-edit-alt me-1"></i> Edit | Detail</a>';
+                        str += '<a class="dropdown-item" href="/ChuTro/Delete/' + value.id + '">';
+                        str += '<i class="bx bx-trash me-1"></i> Delete</a>';
+                        str += '</div>';
+                        str += '</div>';
+                        str += '</td>';
+                        str += '</tr>';
+
+                        // Create pagination
+                        var pagination_string = "";
+                        var pageCurrent = result.pageCurrent;
+                        var numSize = result.numSize;
+
+                        // Create button previous
+                        if(pageCurrent > 1){
+                            var pagePrevious = pageCurrent - 1;
+                            pagination_string += '<li class="page-item">';
+                            pagination_string += '<a class="page-link" href="" data-page="'+ pagePrevious +'">Previous</a>';
+                            pagination_string += '</li>';
+                        }
+
+                        for(var i = 1; i <= numSize; i++){
+                            if(i == pageCurrent) {
+                                pagination_string += '<li class="page-item active">';
+                                pagination_string += '<a class="page-link" href="" data-page="'+ i +'">'+ pageCurrent +'</a>';
+                                pagination_string += '</li>';
+                            } else {
+                                pagination_string += '<li class="page-item">';
+                                pagination_string += '<a class="page-link" href="" data-page="'+ i +'">'+ i +'</a>';
+                                pagination_string += '</li>';
+                            }
+                        }
+
+                        // Create button next
+                        if(pageCurrent > 0 && pageCurrent < numSize){
+                            var pageNext = pageCurrent + 1;
+                            pagination_string += '<li class="page-item">';
+                            pagination_string += '<a class="page-link" href="" data-page="'+ pageNext +'">Next</a>';
+                            pagination_string += '</li>';
+                        }
+
+                        // Load pagination
+                        $("#load-pagination").html(pagination_string);
+                    });
+
+                    // Load str to class="load-list"
+                    $(".load-list").html(str);
+                }
+            });
+        }
+
+        
+
+        // Click event pagination
+        $("body").on("click", ".pagination li a", function(event) {
+            event.preventDefault();
+            var page = $(this).attr('data-page');
+
+            // Load event pagination
+            var txtSearch = $('.txtSearch').val();
+            if(txtSearch != ""){
+                load(txtSearch, page);
+            }else {
+                load(null, page);
+            }
+        });
+
+        // Click event search
+        //$('#search').click(function() {
+        //    var txtSearch = $('.txtSearch').val();
+        //    if(txtSearch != ''){
+        //        load(txtSearch, 1);
+        //    } else {
+        //        load(null, 1);
+        //        }
+        //    });
+        //});
+
+        // Load init
+        load(null, 1);
+     });
+
+</script>

@@ -111,7 +111,7 @@ namespace WebTimTro.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(List<int> dichVu, PhongTroVM phongTro,
+        public JsonResult Create(List<int> dichVu, PhongTroVM phongTro,
             NoteVM ghiChu, List<string> uploadedFilenames)
         {
 
@@ -169,7 +169,7 @@ namespace WebTimTro.Controllers
 
             _unitOfWork.Save();
 
-            return RedirectToAction("Index");
+            return Json(new {status = "ok"});
         }
 
         // Upload nhiều file ảnh của phòng trọ
@@ -241,10 +241,10 @@ namespace WebTimTro.Controllers
             {
                 page = 1;
             }
-            int start = (int)(page - 1) * 10; // 10 is pageSize
+            int start = (int)(page - 1) * 7; // 7 is pageSize
             ViewBag.pageCurrent = page;
             int totalPage = data.Count();
-            float totalNumsize = (totalPage / (float)10);
+            float totalNumsize = (totalPage / (float)7);
             int numSize = (int)Math.Ceiling(totalNumsize);
             ViewBag.numSize = numSize;
             var dataPost = data.OrderByDescending(x => x.Id)
@@ -407,12 +407,48 @@ namespace WebTimTro.Controllers
         // [Authorize(Roles = "nguoidung")]
         public IActionResult Saved()
         {
-            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
-            List<PhongTro> phongTros = _unitOfWork.PhongTro
-                .GetPhongTrosByNguoiDungId(nguoiDungId);
-            List<PhongTroVM> phongTroVM = _mapper.Map<List<PhongTroVM>>(phongTros);
+            //string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            //List<PhongTro> phongTros = _unitOfWork.PhongTro
+            //    .GetPhongTrosByNguoiDungId(nguoiDungId);
+            //List<PhongTroVM> phongTroVM = _mapper.Map<List<PhongTroVM>>(phongTros);
 
-            return View(phongTroVM);
+            //return View(phongTroVM);
+            return View();
+        }
+
+        // Lấy các post đã được lưu, phân trang
+        [HttpGet]
+        public JsonResult GetAllSavedPost(string txtSearch, int? page)
+        {
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            IEnumerable<PhongTro> data = _unitOfWork.PhongTro.GetPhongTrosByNguoiDungId(nguoiDungId);
+            if (!string.IsNullOrEmpty(txtSearch))
+            {
+                ViewBag.txtSearch = txtSearch;
+                data = data.Where(x => x.Ten.Contains(txtSearch));
+            }
+            if (page > 0)
+            {
+
+            }
+            else
+            {
+                page = 1;
+            }
+            int start = (int)(page - 1) * 7; // 7 is pageSize
+            ViewBag.pageCurrent = page;
+            int totalPage = data.Count();
+            float totalNumsize = (totalPage / (float)7);
+            int numSize = (int)Math.Ceiling(totalNumsize);
+            ViewBag.numSize = numSize;
+            var dataPost = data.OrderByDescending(x => x.Id)
+                .Skip(start).Take(7);
+            List<PhongTro> listPost = new List<PhongTro>();
+            listPost = dataPost.ToList();
+            List<PhongTroVM> listPostVM = _mapper
+                .Map<List<PhongTro>, List<PhongTroVM>>(listPost);
+
+            return Json(new { data = listPostVM, pageCurrent = page, numSize = numSize });
         }
 
         // Xoá bài viết mà người dùng đã lưu với id cho trước

@@ -196,9 +196,9 @@
           <ul class="menu-inner py-1">
             <!-- Dashboard -->
             <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Category") ? "active" : "")">
-              <a asp-controller="Category" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-category"></i>
-                <div data-i18n="Analytics">Category</div>
+              <a asp-controller="Home" asp-action="Index" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-compass"></i>
+                <div data-i18n="Analytics">Khám phá</div>
               </a>
             </li>
 
@@ -208,9 +208,9 @@
             
             <!-- Cards -->
             <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("PostManager") ? "active" : "") ">
-              <a asp-controller="PostManager" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-book"></i>
-                <div data-i18n="Basic">Post Manager</div>
+              <a asp-controller="PhongTro" asp-action="Saved" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-bookmark"></i>
+                <div data-i18n="Basic">Lưu trữ</div>
               </a>
             </li>
            
@@ -228,7 +228,9 @@
                 <div data-i18n="Boxicons">Reported Comment</div>
               </a>
             </li>
+            
             <partial name="_LoginPartial" />
+                   
           </ul>
         </aside>
         <!-- / Menu -->
