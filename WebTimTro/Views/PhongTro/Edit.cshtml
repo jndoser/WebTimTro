@@ -4,6 +4,7 @@
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     string ngayHetHan = Model.NgayHetHan.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss");
+    string ngayDang = Model.NgayDang.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss");
     NoteVM ghiChu = ViewBag.GhiChu;
     List<DichVuVM> dichVusVM = ViewBag.DichVuCuaPhongTro;
     List<DichVuVM> allDichVuVM = ViewBag.TatCaDichVu;
@@ -72,6 +73,9 @@
                     <div class="col-md-10">
                         <input class="form-control" type="datetime-local" value="@ngayHetHan" id="ngayHetHan">
                     </div>
+                </div>
+                <div class="mb-3 row">
+                    <input hidden class="form-control" type="datetime-local" value="@ngayDang" id="ngayDang">
                 </div>
                 <div class="mb-3">
                     <label for="formFileMultiple" class="form-label">Tải lên những hình ảnh về phòng trọ</label>
@@ -185,11 +189,12 @@
 
         var gia = $('#gia').val();
         var ngayHetHan = $('#ngayHetHan').val();
-        
+        var ngayDang = $('#ngayDang').val();
 
         // Lấy dữ liệu ghi chú của chủ trọ
         var tenGhiChu = $('#tieuDeNote').val();
         var noiDungGhiChu = $('#noiDungNote').val();
+
 
         const phongTro = {
             id: @Model.Id,
@@ -198,10 +203,11 @@
             sucChua : sucChua,
             moTa : moTa,
             gia : gia,
-            ngayDang: @Model.NgayDang,
+            ngayDang: ngayDang,
             ngayHetHan: ngayHetHan
         };
 
+        
         const ghiChu = {
             ten: tenGhiChu,
             noiDung: noiDungGhiChu

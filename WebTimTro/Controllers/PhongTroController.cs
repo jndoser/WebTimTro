@@ -176,6 +176,10 @@ namespace WebTimTro.Controllers
         [HttpPost]
         public async Task<JsonResult> UploadFile(IList<IFormFile> files)
         {
+            if(files.Count == 0)
+            {
+                return Json(new { status = "ok", uploadedfiles = "" });
+            }
             List<string> uploadedFiles = new List<string>();
             foreach (IFormFile source in files)
             {
@@ -298,7 +302,7 @@ namespace WebTimTro.Controllers
             _unitOfWork.Save();
 
             // Update dữ liệu hình ảnh tương ứng với phòng trọ đã tạo 
-            if(uploadedFilenames != null)
+            if (uploadedFilenames[0] != null)
             {
                 // Lấy ra các filename của những hình ảnh về
                 // phòng trọ trước đây
