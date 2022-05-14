@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using WebTimTro.Interfaces;
 using WebTimTro.Models;
 
@@ -19,17 +21,60 @@ namespace WebTimTro.Controllers
         }
         public IActionResult Index()
         {
+            //var reportedComments = _unitOfWork.BinhLuan.GetReportedComments();
+            //var reportedCommentsModel = _mapper
+            //    .Map<IEnumerable<ReportedBinhLuanVM>>(reportedComments);
+
+            //foreach (var comment in reportedCommentsModel)
+            //{
+            //    comment.TenCuaNguoiDang = _unitOfWork.BinhLuan
+            //        .GetAuthorByCommentId(comment.Id);
+            //}
+
+            //return View(reportedCommentsModel);
+            return View();
+        }
+
+        // Lấy các bình luận bị report, phân trang
+        [HttpGet]
+        public JsonResult GetAllReportedBinhLuan(string txtSearch, int? page)
+        {
             var reportedComments = _unitOfWork.BinhLuan.GetReportedComments();
-            var reportedCommentsModel = _mapper
+            var data = _mapper
                 .Map<IEnumerable<ReportedBinhLuanVM>>(reportedComments);
 
-            foreach (var comment in reportedCommentsModel)
+            foreach (var comment in data)
             {
                 comment.TenCuaNguoiDang = _unitOfWork.BinhLuan
                     .GetAuthorByCommentId(comment.Id);
             }
 
-            return View(reportedCommentsModel);
+            if (!string.IsNullOrEmpty(txtSearch))
+            {
+                ViewBag.txtSearch = txtSearch;
+                data = data.Where(x => x.NoiDung.Contains(txtSearch));
+            }
+            if (page > 0)
+            {
+
+            }
+            else
+            {
+                page = 1;
+            }
+            int start = (int)(page - 1) * 7; // 7 is pageSize
+            ViewBag.pageCurrent = page;
+            int totalPage = data.Count();
+            float totalNumsize = (totalPage / (float)7);
+            int numSize = (int)Math.Ceiling(totalNumsize);
+            ViewBag.numSize = numSize;
+            var dataBinhLuan = data.OrderByDescending(x => x.Id)
+                .Skip(start).Take(7);
+            List<ReportedBinhLuanVM> listBinhLuan = new List<ReportedBinhLuanVM>();
+            listBinhLuan = dataBinhLuan.ToList();
+            
+
+            return Json(new { data = listBinhLuan, pageCurrent = page, numSize = numSize });
         }
 
         public IActionResult Hide(int id)

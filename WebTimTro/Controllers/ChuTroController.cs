@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using WebTimTro.Data;
 using WebTimTro.Interfaces;
@@ -28,10 +29,46 @@ namespace WebTimTro.Controllers
         }
         public IActionResult Index()
         {
-            var users = _unitOfWork.NguoiDung.GetAllNguoiDungWithChuTroRole();
-            var usersModel = _mapper.Map<IEnumerable<NguoiDung>, IEnumerable<NguoiDungVM>>(users);
+            //var users = _unitOfWork.NguoiDung.GetAllNguoiDungWithChuTroRole();
+            //var usersModel = _mapper.Map<IEnumerable<NguoiDung>, IEnumerable<NguoiDungVM>>(users);
 
-            return View(usersModel);
+            //return View(usersModel);
+            return View();
+        }
+
+        // Lấy các người dùng đã được tạo, phân trang
+        [HttpGet]
+        public JsonResult GetAllChuTro(string txtSearch, int? page)
+        {
+            IEnumerable<NguoiDung> data =
+                _unitOfWork.NguoiDung.GetAllNguoiDungWithChuTroRole();
+            if (!string.IsNullOrEmpty(txtSearch))
+            {
+                ViewBag.txtSearch = txtSearch;
+                data = data.Where(x => x.LastName.Contains(txtSearch));
+            }
+            if (page > 0)
+            {
+
+            }
+            else
+            {
+                page = 1;
+            }
+            int start = (int)(page - 1) * 7; // 7 is pageSize
+            ViewBag.pageCurrent = page;
+            int totalPage = data.Count();
+            float totalNumsize = (totalPage / (float)7);
+            int numSize = (int)Math.Ceiling(totalNumsize);
+            ViewBag.numSize = numSize;
+            var dataNguoiDung = data.OrderByDescending(x => x.Id)
+                .Skip(start).Take(10);
+            List<NguoiDung> listNguoiDung = new List<NguoiDung>();
+            listNguoiDung = dataNguoiDung.ToList();
+            List<NguoiDungVM> listNguoiDungVM = _mapper
+                .Map<List<NguoiDung>, List<NguoiDungVM>>(listNguoiDung);
+
+            return Json(new { data = listNguoiDungVM, pageCurrent = page, numSize = numSize });
         }
 
         public IActionResult Edit(string id)
