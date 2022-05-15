@@ -17,6 +17,9 @@ namespace WebTimTro.Data
         // Chủ trọ có thể viết và lưu lại để đăng sau 
         public bool TrangThaiDang { get; set; } = true;
 
+        public decimal Longitude { get; set; }
+        public decimal Latitude { get; set; }
+
         // 1 phòng trọ do 1 chủ trọ tạo
         public string ChuTroId { get; set; }
         public NguoiDung ChuTro { get; set; }

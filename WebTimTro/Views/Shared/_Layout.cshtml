@@ -117,9 +117,27 @@
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="~/resources/assets/js/config.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  </head>
 
-  <body>
+
+    <!--Goong io Maps API-->
+    
+    <script src='https://cdn.jsdelivr.net/npm/@@goongmaps/goong-js@1.0.9/dist/goong-js.js'></script>
+    <link href='https://cdn.jsdelivr.net/npm/@@goongmaps/goong-js@1.0.9/dist/goong-js.css' rel='stylesheet' />
+
+    <!-- Load the `goong-geocoder` plugin. -->
+    <script src="https://cdn.jsdelivr.net/npm/@@goongmaps/goong-geocoder/dist/goong-geocoder.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@@goongmaps/goong-geocoder/dist/goong-geocoder.css"
+          rel="stylesheet"
+          type="text/css" />
+
+    <!-- Promise polyfill script is required -->
+    <!-- to use Goong Geocoder in IE 11. -->
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+
+</head>
+
+<body>
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
@@ -253,12 +271,13 @@
 
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
               <!-- Search -->
-              <div class="navbar-nav align-items-center">
+              @*<div class="navbar-nav align-items-center">
                 <div class="nav-item d-flex align-items-center">
                   <i class="bx bx-search fs-4 lh-0"></i>
                   <input type="text" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search...">
                 </div>
-              </div>
+              </div>*@
+              @RenderSection("Search", required: false)
               <!-- /Search -->
 
               <ul class="navbar-nav flex-row align-items-center ms-auto">
@@ -328,12 +347,7 @@
     <!-- / Layout wrapper -->
 
     <div class="buy-now">
-      <a
-        href="https://themeselection.com/products/sneat-bootstrap-html-admin-template/"
-        target="_blank"
-        class="btn btn-danger btn-buy-now"
-        >Upgrade to Pro</a
-      >
+      
     </div>
 
     <!-- Core JS -->

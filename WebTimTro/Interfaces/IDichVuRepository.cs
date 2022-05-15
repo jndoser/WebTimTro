@@ -8,5 +8,6 @@ namespace WebTimTro.Interfaces
         public void DeleteDichVusByPhongTroId(int phongTroId);
         public int GetAddedDichVuId();
         public List<string> GetSomeDichVuOfPhongTroList();
+        public List<string> GetSomeDichVuOfPhongTroList(IEnumerable<PhongTro> phongTros);
     }
 }

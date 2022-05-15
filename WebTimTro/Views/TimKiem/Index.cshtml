@@ -1,0 +1,49 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="card" style="margin-left: 20px; margin-right: 20px; margin-top: 30px; padding:15px;">
+    <div id="map" style="width:1000px; height:480px;"></div>
+</div>
+
+
+<script>
+    goongjs.accessToken = 'TNwi4dTRydZLkZeH6Gi78EXYlpTYZ0qRuntr1LPY';
+    var map = new goongjs.Map({
+        container: 'map',
+        style: 'https://tiles.goong.io/assets/goong_map_web.json',
+        center: [105.84478, 21.02897],
+        zoom: 13
+    });
+
+    // Add the control to the map.
+    var geocoder = new GoongGeocoder({
+        accessToken: 'E5ycgkTiRNvLJ7BqyM2H4kC0LJWGqbJKK2eVWUQH',
+        goongjs: goongjs,
+        marker: false
+    });
+    map.addControl(
+        geocoder
+    );
+
+    geocoder.on('result', function(e) {
+        var geo = e.result.result.geometry.location;
+        console.log(e);
+        console.log(geo);
+        var marker = new goongjs.Marker({
+        draggable: true
+        })
+        .setLngLat([geo.lng, geo.lat])
+        .addTo(map);
+
+        function onDragEnd() {
+            var lngLat = marker.getLngLat();
+                console.log('drag to: ' + lngLat.lng + ':' + lngLat.lat);
+            }
+ 
+        marker.on('dragend', onDragEnd);
+    });
+
+</script>

@@ -79,5 +79,19 @@ namespace WebTimTro.Repository
         }
 
 
+        // Lấy ra danh sách các file hình ảnh - hình đầu tiên của 
+        // các bài viết về phòng trọ được truyền vào
+        public List<string> GetFirstHinhAnhListOfPhongTroList(IEnumerable<PhongTro> phongTros)
+        {
+            List<string> result = new List<string>();
+            var phongTroIds = phongTros.OrderBy(x => x.Id)
+                .Select(x => x.Id);
+            foreach (var phongTroId in phongTroIds)
+            {
+                string firstHinhAnhUrl = GetListFileNameByPhongTroId(phongTroId)[0];
+                result.Add(firstHinhAnhUrl);
+            }
+            return result;
+        }
     }
 }

@@ -1,12 +1,24 @@
 ﻿@*@model IEnumerable<WebTimTro.Models.PhongTroVM>
 @inject WebTimTro.Interfaces.IUnitOfWork _unitOfWork
-
 *@
+@using static WebTimTro.Models.SearchPhongTroOptionsVM
+
 @{
     ViewData["Title"] = "Home Page";
     //List<PhongTroVM> phongTros = Model.ToList();
     //List<string> firstHinhAnhs = ViewBag.FirstHinhAnhs;
     //List<string> someDichVu = ViewBag.SomeDichVu;
+    //SearchPhongTroOptionsVM searchOptions = (ViewBag.SearchOptions != null) ? ViewBag.SearchOptions : null;    
+}
+
+@section Search
+{
+    <div class="navbar-nav align-items-center">
+        <div class="nav-item d-flex align-items-center">
+            <i class="bx bx-search fs-4 lh-0"></i>
+            <input onclick="ShowSearchOptions()" type="text" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search...">
+        </div>
+    </div>
 }
 
 <div class="row mb-5 load-list" style="margin-left:10px;">
@@ -40,6 +52,7 @@
         </div>
     }*@
 </div>
+<input hidden id="searchStatus" value="0"/>
 <div class="demo-inline-spacing" style="margin-left:5px;">
     <!-- Basic Pagination -->
     <nav aria-label="Page navigation">
@@ -71,9 +84,74 @@
         </ul>
     </nav>
     <!--/ Basic Pagination -->
-</div>
-<script>
+    </div>
+
+    <div class="modal fade show" id="searchModal" tabindex="-1" aria-modal="true" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel4">Tìm kiếm phòng trọ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2">
+                        <div class="col mb-0">
+                            <label for="khuVuc" class="form-label">Khu vực</label>
+                            <select id="khuVuc" class="form-select">
+                                <option>Tất cả</option>
+                                <option value="Quận 1">Quận 1</option>
+                                <option value="Thủ Đức">Thành phố Thủ Đức</option>
+                                <option value="Quận 3">Quận 3</option>
+                                <option value="Quận 4">Quận 4</option>
+                                <option value="Quận 5">Quận 5</option>
+                                <option value="Quận 6">Quận 6</option>
+                                <option value="Quận 7">Quận 7</option>
+                                <option value="Quận 8">Quận 8</option>
+                                <option value="Quận 10">Quận 10</option>
+                                <option value="Quận 11">Quận 11</option>
+                                <option value="Quận 12">Quận 12</option>
+                                <option value="Bình Thạnh">Quận Bình Thạnh</option>
+                                <option value="Bình Tân">Quận Bình Tân</option>
+                                <option value="Gò Vấp">Quận Gò Vấp</option>
+                                <option value="Phú Nhuận">Quận Phú Nhuận</option>
+                                <option value="Tân Bình">Quận Tân Bình</option>
+                                <option value="Tân Phú">Quận Tân Phú</option>
+                                <option value="Bình Chánh">Huyện Bình Chánh</option>
+                                <option value="Cần Giờ">Huyện Cần Giờ</option>
+                                <option value="Củ Chi">Huyện Củ Chi</option>
+                                <option value="Hóc Môn">Huyện Hóc Môn</option>
+                                <option value="Nhà Bè">Huyện Nhà Bè</option>
+                            </select>
+                        </div>
+                        <div class="col mb-0">
+                            <label for="gia" class="form-label">Giá</label>
+                            <input type="text" id="gia" class="form-control" placeholder="4000000">
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col mb-0">
+                            <label for="soNguoiO" class="form-label">Số người ở</label>
+                            <input type="number" id="soNguoiO" class="form-control" placeholder="2">
+                        </div>
+                        <div class="col mb-0">
+                            <label for="tienIchLanCan" class="form-label">Tiện ích lân cận</label>
+                            <input type="text" id="tienIchLanCan" class="form-control" placeholder="DD / MM / YY">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Huỷ
+                    </button>
+                    <button type="button" onclick="StartSearch(1)" class="btn btn-primary">Tìm kiếm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
     $(function() {
+        $('#searchStatus').val(0);
         // function load pagination
         var load = function(txtSearch, page) {
             $.ajax({
@@ -155,14 +233,22 @@
         $("body").on("click", ".pagination li a", function(event) {
             event.preventDefault();
             var page = $(this).attr('data-page');
+            var searchStatus = $('#searchStatus').val();
 
-            // Load event pagination
-            var txtSearch = $('.txtSearch').val();
-            if (txtSearch != "") {
-                load(txtSearch, page);
+            if (searchStatus == 0) {
+                console.log('searchStatus: ' + searchStatus);
+                // Load event pagination
+                var txtSearch = $('.txtSearch').val();
+                if (txtSearch != "") {
+                    load(txtSearch, page);
+                } else {
+                    load(null, page);
+                }
             } else {
-                load(null, page);
+                console.log('searchStatus: ' + searchStatus);
+                StartSearch(page);
             }
+            
         });
 
         // Click event search
@@ -251,5 +337,110 @@
                 }
             });
         }
+        }
+
+    function ShowSearchOptions() {
+        $('#searchModal').modal('show');
+    }
+
+    function StartSearch(page) {
+        
+        var khuVuc = $('#khuVuc').val();
+        var gia = $('#gia').val();
+        var soNguoiO = $('#soNguoiO').val();
+        var tienIchLanCan = $('#tienIchLanCan').val();
+
+        const searchOptions = {
+            khuVuc: khuVuc,
+            gia: gia,
+            soNguoiO: soNguoiO,
+            tienIchLanCan: tienIchLanCan
+        }
+
+        console.log(searchOptions);
+       
+        console.log('search result on page: ' + page);
+
+        $.ajax({
+            url: '/Home/SearchPhongTro',
+            method: 'post',
+            data: {searchOptions: searchOptions, page: page},
+            success: function(result) {
+                
+                    $('#searchModal').modal('hide');
+                    console.log(result.data);
+                    var str = "";
+                    $.each(result.data, function(index, value) {
+                        str += '<div class="col-md-6 col-lg-4">';
+                        str += '<h6 class="mt-2 text-muted"></h6>';
+                        str += '<div class="card">';
+                        str += '<img class="card-img-top" src="images/' + result.firstHinhAnhs[index] + '" alt="Card image cap">'; 
+                        str += '<div class="card-body">';
+                        str += '<h5 class="card-title">' + value.ten + '</h5>';
+                        str += '<p class="card-text">' + value.sucChua + ' người ở</p>'; 
+                        str += '</div>'; 
+                        str += '<ul class="list-group list-group-flush">'; 
+                        str += '<li class="list-group-item">' + result.someDichVu[index] + '</li>'; 
+                        str += '<li class="list-group-item">Giá: ' + value.gia + ' VND </li>'; 
+                        str += '</ul>'; 
+                        str += '<div class="card-body">';
+                        str += '<a id="isQuanTamPhongTro' + value.id + '" style="cursor:pointer;" onclick="QuanTam(' + value.id + ')" class="card-link">';
+                        str += '' + result.favStatusList[index] + '</a>'; 
+                        str += '<a href="/Home/Detail/' + value.id + '" class="card-link">Xem phòng trọ</a>'; 
+                        str += '<a id="isSavedPhongTro' + value.id + '" style="cursor:pointer;" onclick="Save(' + value.id + ')" class="card-link">';
+                        str += '' + result.savedStatusList[index] + '</a>';
+                        str += '</div>'; 
+                        str += '</div>';
+                        str += '</div>'; 
+
+                        // Create pagination
+                        var pagination_string = "";
+                        var pageCurrent = result.pageCurrent;
+                        var numSize = result.numSize;
+
+                        // Create button previous
+                        if (pageCurrent > 1) {
+                            var pagePrevious = pageCurrent - 1;
+                            pagination_string += '<li class="page-item">';
+                            pagination_string += '<a class="page-link" href="" data-page="' + pagePrevious + '">Previous</a>';
+                            pagination_string += '</li>';
+                        }
+
+                        for (var i = 1; i <= numSize; i++) {
+                            if (i == pageCurrent) {
+                                pagination_string += '<li class="page-item active">';
+                                pagination_string += '<a class="page-link" href="" data-page="' + i + '">' + pageCurrent + '</a>';
+                                pagination_string += '</li>';
+                            } else {
+                                pagination_string += '<li class="page-item">';
+                                pagination_string += '<a class="page-link" href="" data-page="' + i + '">' + i + '</a>';
+                                pagination_string += '</li>';
+                            }
+                        }
+
+                        // Create button next
+                        if (pageCurrent > 0 && pageCurrent < numSize) {
+                            var pageNext = pageCurrent + 1;
+                            pagination_string += '<li class="page-item">';
+                            pagination_string += '<a class="page-link" href="" data-page="' + pageNext + '">Next</a>';
+                            pagination_string += '</li>';
+                        }
+
+                        // Load pagination
+                        $("#load-pagination").html(pagination_string);
+                    });
+                    // Load str to class="load-list"
+                    $(".load-list").html(str);
+                    // Set trạng thái search là 1
+                    // để khi ấn các nút phân trang
+                    // nó sẽ chạy hàm StartSearch
+                    // thay vì hàm load mặc định
+                    $('#searchStatus').val(1);
+                              
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
     }
 </script>

@@ -28,7 +28,19 @@
                     </div>
                 </div>
                 <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label" for="basic-icon-default-fullname">Địa chỉ</label>
+                    <label class="col-sm-2 col-form-label" for="basic-icon-default-fullname">Tìm kiếm địa chỉ (powered by goong io)</label>
+                    
+                    <div class="col-sm-10">
+                        <div class="input-group input-group-merge">
+                            <div id="geocoder" style="width: 100px;"></div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <input type="number" id="kinhDo" hidden/>
+                <input type="number" id="viDo" hidden/>
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label" for="basic-icon-default-fullname">Địa chỉ tương ứng với kết quả tìm kiếm</label>
                     <div class="col-sm-10">
                         <div class="input-group input-group-merge">
                             <span id="basic-icon-default-fullname2" class="input-group-text"><i class="bx bx-map"></i></span>
@@ -133,6 +145,22 @@
 <!--TinyMCE config-->
 
 <script>
+
+    $(function() {
+        var geocoder = new GoongGeocoder({
+            accessToken: 'E5ycgkTiRNvLJ7BqyM2H4kC0LJWGqbJKK2eVWUQH'
+        });
+        geocoder.addTo('#geocoder');
+
+        // Add geocoder result to container.
+        geocoder.on('result', function (e) {
+            $('#diaChi').val(e.result.result.formatted_address);
+            $('#kinhDo').val(e.result.result.geometry.location.lng);
+            $('#viDo').val(e.result.result.geometry.location.lat);
+        });
+    });
+
+
     function Test(){
         // Lấy dữ liệu về bài đăng phòng trọ 
         var tenPhongTro = $('#tenPhongTro').val();
@@ -143,7 +171,10 @@
 
         var gia = $('#gia').val();
         var ngayHetHan = $('#ngayHetHan').val();
-        
+        var lng = $('#kinhDo').val();
+        var lat = $('#viDo').val();
+
+        console.log('toa do cua phong tro: ' + lng + ':' + lat);
 
         // Lấy dữ liệu ghi chú của chủ trọ
         var tenGhiChu = $('#tieuDeNote').val();
@@ -155,7 +186,9 @@
             sucChua : sucChua,
             moTa : moTa,
             gia : gia,
-            ngayHetHan: ngayHetHan
+            ngayHetHan: ngayHetHan,
+            longitude: lng,
+            latitude: lat
         };
 
         const ghiChu = {

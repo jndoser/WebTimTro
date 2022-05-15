@@ -11,5 +11,6 @@ namespace WebTimTro.Interfaces
         // với phòng trọ Id
         public void DeleteHinhAnhsByPhongTroId(int phongTroId);
         public List<string> GetFirstHinhAnhListOfPhongTroList();
+        public List<string> GetFirstHinhAnhListOfPhongTroList(IEnumerable<PhongTro> phongTros);
     }
 }

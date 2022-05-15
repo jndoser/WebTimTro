@@ -14,6 +14,14 @@ namespace WebTimTro.Configurations
             builder.HasOne(x => x.ChuTro)
                 .WithMany(y => y.PhongTros)
                 .HasForeignKey(x => x.ChuTroId);
+
+            // Set kiểu dữ liệu cho kinh độ và vĩ độ trong db có scale cao
+            // để không bị truncate phần thập phân
+            builder.Property(x => x.Longitude)
+                .HasColumnType("decimal(24,19)");
+
+            builder.Property(x => x.Latitude)
+                .HasColumnType("decimal(24,19)");
         }
     }
 }

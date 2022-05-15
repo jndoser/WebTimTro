@@ -17,6 +17,8 @@ namespace WebTimTro.Models
 
         // Chủ trọ có thể viết và lưu lại để đăng sau 
         public bool TrangThaiDang { get; set; } = true;
+        public decimal Longitude { get; set; }
+        public decimal Latitude { get; set; }
 
         public List<IFormFile> Files { get; set; }
     }

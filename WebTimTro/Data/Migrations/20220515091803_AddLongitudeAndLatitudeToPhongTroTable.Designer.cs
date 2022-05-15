@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebTimTro.Data;
 
 namespace WebTimTro.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220515091803_AddLongitudeAndLatitudeToPhongTroTable")]
+    partial class AddLongitudeAndLatitudeToPhongTroTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,21 +51,21 @@ namespace WebTimTro.Data.Migrations
                         new
                         {
                             Id = "admin",
-                            ConcurrencyStamp = "432bfb7b-a53c-435a-aac2-346b6832e724",
+                            ConcurrencyStamp = "ab68ab29-4a9b-41e3-85ef-7f551b9e2956",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "nguoidung",
-                            ConcurrencyStamp = "76c3f5d4-4ddb-4ee9-b467-75672b9937ff",
+                            ConcurrencyStamp = "9b0c7c46-3363-4e17-805d-40e77a59a80c",
                             Name = "Nguoidung",
                             NormalizedName = "NGUOIDUNG"
                         },
                         new
                         {
                             Id = "chutro",
-                            ConcurrencyStamp = "3fa9dada-d20a-40a7-8e5e-a80ab6571c9f",
+                            ConcurrencyStamp = "24d1c72c-eda9-4ca3-acc3-ff1363699669",
                             Name = "Chutro",
                             NormalizedName = "CHUTRO"
                         });
@@ -419,11 +421,11 @@ namespace WebTimTro.Data.Migrations
                     b.Property<long>("Gia")
                         .HasColumnType("bigint");
 
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(24,19)");
+                    b.Property<long>("Latitude")
+                        .HasColumnType("bigint");
 
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(24,19)");
+                    b.Property<long>("Longitude")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("MoTa")
                         .HasColumnType("nvarchar(max)");

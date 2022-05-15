@@ -371,6 +371,90 @@ namespace WebTimTro.Controllers
             return Json(comment);
         }
 
+        // Tìm kiếm phòng trọ theo yêu cầu và trả về kết quả 
+        // tương ứng
+        public JsonResult SearchPhongTro(SearchPhongTroOptionsVM searchOptions, int? page)
+        {
+            
+            var data = _unitOfWork.PhongTro.GetAll()
+                .Where(x => x.DiaChi.Contains(searchOptions.KhuVuc) ||
+                x.Gia <= searchOptions.Gia || x.SucChua == searchOptions.SoNguoiO);
+
+            if (page > 0)
+            {
+
+            }
+            else
+            {
+                page = 1;
+            }
+            int start = (int)(page - 1) * 7; // 7 is pageSize
+            ViewBag.pageCurrent = page;
+            int totalPage = data.Count();
+            float totalNumsize = (totalPage / (float)7);
+            int numSize = (int)Math.Ceiling(totalNumsize);
+            ViewBag.numSize = numSize;
+            var dataPost = data.OrderByDescending(x => x.Id)
+                .Skip(start).Take(7);
+            List<PhongTro> listPost = new List<PhongTro>();
+            listPost = dataPost.ToList();
+            List<PhongTroVM> listPostVM = _mapper
+                .Map<List<PhongTro>, List<PhongTroVM>>(listPost);
+
+
+            // Lấy tất cả các hình ảnh đầu tiên tương ứng với tất cả
+            // các phòng trọ ở trên
+            IEnumerable<string> firstHinhAnhs = _unitOfWork.HinhAnh
+                .GetFirstHinhAnhListOfPhongTroList(data).Skip(start).Take(7);
+            List<string> firstHinhAnhList = firstHinhAnhs.ToList();
+
+            // Lấy các dịch vụ tương ứng với tất cả các phòng trọ ở trên
+            IEnumerable<string> someDichVu = _unitOfWork.DichVu
+                .GetSomeDichVuOfPhongTroList(data).Skip(start).Take(7);
+            List<string> someDichVuList = someDichVu.ToList();
+
+            // Kiểm tra xem các bài viết đã được quan tâm hay đã được người dùng lưu chưa
+            // và truyền sang phía giao diện
+            List<string> savedStatusList = new List<string>();
+            foreach (var phongTro in listPostVM)
+            {
+                if (_unitOfWork.PhongTroLuuTru.IsSaved(
+                    _unitOfWork.NguoiDung.GetUserId(), phongTro.Id))
+                {
+                    savedStatusList.Add("Đã lưu");
+                }
+                else
+                {
+                    savedStatusList.Add("Lưu");
+                }
+            }
+
+            List<string> favStatusList = new List<string>();
+            foreach (var phongTro in listPostVM)
+            {
+                if (_unitOfWork.PhongTroQuanTam.IsQuanTam(
+                    _unitOfWork.NguoiDung.GetUserId(), phongTro.Id))
+                {
+                    favStatusList.Add("Đã quan tâm");
+                }
+                else
+                {
+                    favStatusList.Add("Quan tâm");
+                }
+            }
+
+            return Json(new
+            {
+                data = listPostVM,
+                pageCurrent = page,
+                numSize = numSize,
+                firstHinhAnhs = firstHinhAnhList,
+                someDichVu = someDichVuList,
+                savedStatusList = savedStatusList,
+                favStatusList = favStatusList
+            });
+        }
+
         public IActionResult Privacy()
         {
             return View();
