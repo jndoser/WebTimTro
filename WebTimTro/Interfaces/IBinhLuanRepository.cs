@@ -40,5 +40,8 @@ namespace WebTimTro.Interfaces
 
         // Get list of comment that user report
         public ICollection<BinhLuan> GetReportedComments();
+
+        // Count numbers of comment in a post
+        public int GetNumbersOfCommentByPostId(int postId);
     }
 }

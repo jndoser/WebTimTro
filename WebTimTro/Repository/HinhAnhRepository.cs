@@ -68,7 +68,7 @@ namespace WebTimTro.Repository
         public List<string> GetFirstHinhAnhListOfPhongTroList()
         {
             List<string> result = new List<string>();
-            var phongTroIds = _context.PhongTros.OrderBy(x => x.Id)
+            var phongTroIds = _context.PhongTros.OrderByDescending(x => x.Id)
                 .Select(x => x.Id);
             foreach(var phongTroId in phongTroIds)
             {

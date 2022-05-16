@@ -7,5 +7,6 @@ namespace WebTimTro.Interfaces
         public PhongTroQuanTam GetPhongTroQuanTamByNguoiDungIdAndPhongTroId(string nguoiDungId,
             int phongTroId);
         public bool IsQuanTam(string nguoiDungId, int phongTroId);
+        public int NumbersOfQuanTam(int phongTroId);
     }
 }

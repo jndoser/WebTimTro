@@ -51,6 +51,11 @@
 
 
 @using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Identity
+@using WebTimTro.Data
+@inject SignInManager<NguoiDung> SignInManager
+@inject UserManager<NguoiDung> UserManager
+
 <!DOCTYPE html>
 
 <!-- =========================================================
@@ -213,6 +218,27 @@
 
           <ul class="menu-inner py-1">
             <!-- Dashboard -->
+            @if(SignInManager.IsSignedIn(User))
+            {
+                if(User.IsInRole("Administrator"))
+                {
+                    <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Category") ? "active" : "")">
+                      <a asp-controller="DichVu" asp-action="Index" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-cool"></i>
+                        <div data-i18n="Analytics">Admin zone</div>
+                      </a>
+                    </li>
+                }
+                if (User.IsInRole("Chutro"))
+                {
+                    <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Category") ? "active" : "")">
+                      <a asp-controller="PhongTro" asp-action="Index" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-building-house"></i>
+                        <div data-i18n="Analytics">Phòng trọ của tôi</div>
+                      </a>
+                    </li>
+                }
+            }
             <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Category") ? "active" : "")">
               <a asp-controller="Home" asp-action="Index" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-compass"></i>

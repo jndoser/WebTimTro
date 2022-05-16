@@ -32,5 +32,13 @@ namespace WebTimTro.Repository
 
             return count > 0;
         }
+
+        // Đếm số lượng quan tâm của một bài viết
+        public int NumbersOfQuanTam(int phongTroId)
+        {
+            return _context.PhongTroQuanTams
+                .Where(x => x.PhongTroId == phongTroId)
+                .Count();
+        }
     }
 }
