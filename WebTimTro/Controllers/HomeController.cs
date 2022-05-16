@@ -118,9 +118,17 @@ namespace WebTimTro.Controllers
                 }
             }
 
+            List<int> numberOfQuanTamList = new List<int>();
+            foreach(var phongTro in listPostVM)
+            {
+                int numOfQuanTam = _unitOfWork.PhongTroQuanTam.NumbersOfQuanTam(phongTro.Id);
+                numberOfQuanTamList.Add(numOfQuanTam);
+            }
+
             return Json(new { data = listPostVM, pageCurrent = page, numSize = numSize, 
             firstHinhAnhs = firstHinhAnhList, someDichVu = someDichVuList, 
-            savedStatusList = savedStatusList, favStatusList = favStatusList});
+            savedStatusList = savedStatusList, favStatusList = favStatusList,
+            quanTams = numberOfQuanTamList});
         }
 
         public IActionResult Detail(int id)
@@ -443,6 +451,13 @@ namespace WebTimTro.Controllers
                 }
             }
 
+            List<int> numberOfQuanTamList = new List<int>();
+            foreach (var phongTro in listPostVM)
+            {
+                int numOfQuanTam = _unitOfWork.PhongTroQuanTam.NumbersOfQuanTam(phongTro.Id);
+                numberOfQuanTamList.Add(numOfQuanTam);
+            }
+
             return Json(new
             {
                 data = listPostVM,
@@ -451,7 +466,8 @@ namespace WebTimTro.Controllers
                 firstHinhAnhs = firstHinhAnhList,
                 someDichVu = someDichVuList,
                 savedStatusList = savedStatusList,
-                favStatusList = favStatusList
+                favStatusList = favStatusList,
+                quanTams = numberOfQuanTamList
             });
         }
 

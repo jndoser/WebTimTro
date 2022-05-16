@@ -1,4 +1,5 @@
 ﻿@model WebTimTro.Models.PhongTroVM
+@inject WebTimTro.Interfaces.IUnitOfWork _unitOfWork
 
 @{
     ViewData["Title"] = "Detail";
@@ -76,6 +77,29 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mb-3">
+                    <div id="numbersOfLike@(Model.Id)"
+                         class="card-text col-lg-1">
+                        @_unitOfWork.PhongTroQuanTam.NumbersOfQuanTam(Model.Id)
+                    </div>
+                    <div class="card-text col-lg-3"> người quan tâm</div>
+                    <div id="numbersOfBinhLuan@(Model.Id)"
+                         class="card-text col-lg-1">
+                        @_unitOfWork.BinhLuan.GetNumbersOfCommentByPostId(Model.Id)
+                    </div>
+                    <div class="card-text col-lg-3"> người bình luận</div>
+                </div>
+                <div class="row mb-3">
+                    <a id="isQuanTamPhongTro@(Model.Id)" style="cursor:pointer;"
+                       onclick="QuanTam(@(Model.Id))" class="card-link col-lg-4 bx bx-like">
+                        @((_unitOfWork.PhongTroQuanTam.IsQuanTam(_unitOfWork.NguoiDung.GetUserId(), Model.Id)) ? "Đã quan tâm" : "Quan tâm")
+                    </a>
+                    
+                    <a id="isSavedPhongTro@(Model.Id)" style="cursor:pointer;"
+                       onclick="Save(@(Model.Id))" class="card-link col-lg-3 bx bx-save">
+                        @((_unitOfWork.PhongTroLuuTru.IsSaved(_unitOfWork.NguoiDung.GetUserId(), Model.Id)) ? "Đã lưu" : "Lưu")
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -84,7 +108,7 @@
             <h5 class="card-title">Giá trọ: @Model.Gia</h5>
             <div class="card-subtitle text-muted mb-3">Ngày hết hạn đặt trọ: @Model.NgayHetHan</div>
             <p class="card-text">
-                
+
             </p>
             <a href="javascript:void(0)" class="card-link">Đặt phòng trọ</a>
             <a href="javascript:void(0)" class="card-link">Kiểm tra tình trạng trọ</a>
@@ -138,145 +162,145 @@
 <script>
     $(document).ready(LoadComments());
 
-    function LoadComments(){
+    function LoadComments() {
         var postId = @Model.Id;
         $.ajax(
-        {
-        url: "/Home/LoadComments",
-        dataType: 'json',
-        type: 'post',
-        data: {postId: postId},
-        success: function(res){
-            var contents = "";
-            $.each(res.listComment, function(index, element){
-                // Change create At to nicer formata
-                var d = new Date(element.ngayDang);
-                var timeCreate = d.toLocaleString("en-US");
+            {
+                url: "/Home/LoadComments",
+                dataType: 'json',
+                type: 'post',
+                data: { postId: postId },
+                success: function(res) {
+                    var contents = "";
+                    $.each(res.listComment, function(index, element) {
+                        // Change create At to nicer formata
+                        var d = new Date(element.ngayDang);
+                        var timeCreate = d.toLocaleString("en-US");
 
-                // Generate id for reply section
-                var replyId = "reply" + element.id;
+                        // Generate id for reply section
+                        var replyId = "reply" + element.id;
 
-                contents += '<div class="bg-white p-2">';
-                contents += '<div class="d-flex flex-row user-info">';
-                contents += '<img class="rounded-circle" src="/images/'+ res.listAvatar[index] +'" width="40">';
-                contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">'+ res.listAuthorName[index] +'</span><span class="date text-black-50">Shared publicly - '+ timeCreate +'</span></div>';
-                contents +=  '</div>';
-                contents +=  '<div class="mt-2">';
-                contents +=  '<p class="comment-text">' + element.noiDung + '</p>';
-                contents +=  '</div>';
-                contents +=  '</div>';
-                contents +=  '<div class="bg-white">';
-                contents +=  '<div class="d-flex flex-row fs-12">';
-                contents +=  '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
-                contents +=  '<div onclick="ShowHideReply(' + element.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
-                contents += '<div onclick="ReportThisComment(' + element.id +')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
+                        contents += '<div class="bg-white p-2">';
+                        contents += '<div class="d-flex flex-row user-info">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.listAvatar[index] + '" width="40">';
+                        contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">' + res.listAuthorName[index] + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
+                        contents += '</div>';
+                        contents += '<div class="mt-2">';
+                        contents += '<p class="comment-text">' + element.noiDung + '</p>';
+                        contents += '</div>';
+                        contents += '</div>';
+                        contents += '<div class="bg-white">';
+                        contents += '<div class="d-flex flex-row fs-12">';
+                        contents += '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                        contents += '<div onclick="ShowHideReply(' + element.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                        contents += '<div onclick="ReportThisComment(' + element.id + ')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
 
-                contents +=  '</div>';
+                        contents += '</div>';
 
-                // List all reply comment relate to this comment
-                contents += '<div style="margin-left:50px;" id= ' + ("listreplyto" + element.id) + '></div>';
+                        // List all reply comment relate to this comment
+                        contents += '<div style="margin-left:50px;" id= ' + ("listreplyto" + element.id) + '></div>';
 
-                // Add reply comment section
-                contents +=  '<div id=' + replyId +' style="display:none;">';
+                        // Add reply comment section
+                        contents += '<div id=' + replyId + ' style="display:none;">';
 
-                // Nơi viết comment
-                contents +=  '<form method="post">';
-                contents +=  '<div class="bg-light p-2">';
-                contents +=  '<div class="d-flex flex-row align-items-start">';
-                contents +=  '<img class="rounded-circle" src="/images/'+ res.loggedUserAvatar +'" width="40">';
-                contents +=  '<textarea id='+ ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
-                contents +=   '</textarea>';
-                contents +=   '</div>';
-                contents +=   '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                contents +=   '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">post it</div>';
-                contents +=   '<div class="col-lg-5">Cancel</div></div>';
-                contents +=   '</div>';
-                contents +=   '</form>';
+                        // Nơi viết comment
+                        contents += '<form method="post">';
+                        contents += '<div class="bg-light p-2">';
+                        contents += '<div class="d-flex flex-row align-items-start">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40">';
+                        contents += '<textarea id=' + ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
+                        contents += '</textarea>';
+                        contents += '</div>';
+                        contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">post it</div>';
+                        contents += '<div class="col-lg-5">Cancel</div></div>';
+                        contents += '</div>';
+                        contents += '</form>';
 
 
-                contents +=  '</div>';
+                        contents += '</div>';
+                    });
+
+                    $('#listComment').html(contents);
+
+                    console.log(res);
+                },
+                error: function(err) {
+                    console.log(err);
+                }
             });
-
-            $('#listComment').html(contents);
-
-            console.log(res);
-        },
-        error: function(err){
-            console.log(err);
-        }
-        });
     }
 
-    function LoadSubComments(id){
+    function LoadSubComments(id) {
         var parentCommentId = id;
         $.ajax(
-        {
-        url: "/Home/LoadSubCommentsByParentCommentId",
-        dataType: 'json',
-        type: 'post',
-        data: {id: parentCommentId},
-        success: function(res){
-            var replyUsers = res.replyUser;
-            var contents = "";
-            $.each(res.result, function(index, element){
-                // Change create At to nicer formata
-                var d = new Date(element.ngayDang);
-                var timeCreate = d.toLocaleString("en-US");
+            {
+                url: "/Home/LoadSubCommentsByParentCommentId",
+                dataType: 'json',
+                type: 'post',
+                data: { id: parentCommentId },
+                success: function(res) {
+                    var replyUsers = res.replyUser;
+                    var contents = "";
+                    $.each(res.result, function(index, element) {
+                        // Change create At to nicer formata
+                        var d = new Date(element.ngayDang);
+                        var timeCreate = d.toLocaleString("en-US");
 
-                // Generate id for reply section
-                var replyId = "reply" + element.id;
+                        // Generate id for reply section
+                        var replyId = "reply" + element.id;
 
-                contents += '<div class="bg-white p-2" style="backgroud-color: gray;">';
-                contents += '<div class="d-flex flex-row user-info">';
-                contents += '<img class="rounded-circle" src="/images/'+ res.listAvatar[index] +'" width="40">';
-                contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">'+ res.listAuthorName[index] +'</span><span class="date text-black-50">Shared publicly - '+ timeCreate +'</span></div>';
-                contents +=  '</div>';
-                contents +=  '<div class="mt-2">';
-                contents +=  '<p class="comment-text">' + '@@' + replyUsers[index] + ' - '  + element.noiDung + '</p>';
-                contents +=  '</div>';
-                contents +=  '</div>';
-                contents +=  '<div class="bg-white">';
-                contents +=  '<div class="d-flex flex-row fs-12">';
-                contents +=  '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
-                contents +=  '<div onclick="ShowHideReply(' + element.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
-                contents += '<div onclick="ReportThisComment(' + element.id +')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
+                        contents += '<div class="bg-white p-2" style="backgroud-color: gray;">';
+                        contents += '<div class="d-flex flex-row user-info">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.listAvatar[index] + '" width="40">';
+                        contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">' + res.listAuthorName[index] + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
+                        contents += '</div>';
+                        contents += '<div class="mt-2">';
+                        contents += '<p class="comment-text">' + '@@' + replyUsers[index] + ' - ' + element.noiDung + '</p>';
+                        contents += '</div>';
+                        contents += '</div>';
+                        contents += '<div class="bg-white">';
+                        contents += '<div class="d-flex flex-row fs-12">';
+                        contents += '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                        contents += '<div onclick="ShowHideReply(' + element.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                        contents += '<div onclick="ReportThisComment(' + element.id + ')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
 
-                contents +=  '</div>';
-
-
-                // Add reply comment section
-                contents +=  '<div id=' + replyId +' style="display: none;">';
-
-                // Nơi viết comment
-                contents +=  '<form method="post">';
-                contents +=  '<div class="bg-light p-2">';
-                contents +=  '<div class="d-flex flex-row align-items-start">';
-                contents +=  '<img class="rounded-circle" src="/images/'+ res.loggedUserAvatar +'" width="40">';
-                contents +=  '<textarea id='+ ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
-                contents +=   '</textarea>';
-                contents +=   '</div>';
-                contents +=   '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                contents +=   '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">post it</div>';
-                contents +=   '<div class="col-lg-5">Cancel</div></div>';
-                contents +=   '</div>';
-                contents +=   '</form>';
+                        contents += '</div>';
 
 
-                contents +=  '</div>';
+                        // Add reply comment section
+                        contents += '<div id=' + replyId + ' style="display: none;">';
+
+                        // Nơi viết comment
+                        contents += '<form method="post">';
+                        contents += '<div class="bg-light p-2">';
+                        contents += '<div class="d-flex flex-row align-items-start">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40">';
+                        contents += '<textarea id=' + ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
+                        contents += '</textarea>';
+                        contents += '</div>';
+                        contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">post it</div>';
+                        contents += '<div class="col-lg-5">Cancel</div></div>';
+                        contents += '</div>';
+                        contents += '</form>';
+
+
+                        contents += '</div>';
+                    });
+
+                    $('#listreplyto' + id).html(contents);
+
+                    console.log('subcomment of comment: ' + id);
+                    console.log(res);
+                },
+                error: function(err) {
+                    console.log(err);
+                }
             });
-
-            $('#listreplyto' + id).html(contents);
-
-            console.log('subcomment of comment: ' + id);
-            console.log(res);
-        },
-        error: function(err){
-            console.log(err);
-        }
-        });
     }
 
-    function ShowHideReply(id){
+    function ShowHideReply(id) {
         LoadSubComments(id);
 
         var x = document.getElementById("reply" + id);
@@ -287,158 +311,175 @@
         }
     }
 
-    function PostCommentOnPost(){
-            var postId = @Model.Id;
-            var content = $("#commentOnPost").val();
+    function PostCommentOnPost() {
+        var postId = @Model.Id;
+        var content = $("#commentOnPost").val();
 
-            $.ajax(
+        $.ajax(
             {
-            url: "/Home/SaveCommentOnPost",
-            dataType: 'json',
-            type: 'post',
-            data: {postId: postId, content: content},
-            success: function(res){
-                if(res.status == "ok"){
-                    console.log("ok");
-                    var newComment = res.result;
-                    console.log(newComment);
-                    var contents = "";
-
-                    // Change create At to nicer formata
-                    var d = new Date(newComment.ngayDang);
-                    var timeCreate = d.toLocaleString("en-US");
-
-                    // Generate id for reply section
-                    var replyId = "reply" + newComment.id;
-
-                    contents += '<div class="bg-white p-2">';
-                    contents += '<div class="d-flex flex-row user-info">';
-                    contents += '<img class="rounded-circle" src="/images/'+ res.avatarOfUserWriteThisComment +'" width="40">';
-                    contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">'+ res.nameOfUserWriteThisComment +'</span><span class="date text-black-50">Shared publicly - '+ timeCreate +'</span></div>';
-                    contents +=  '</div>';
-                    contents +=  '<div class="mt-2">';
-                    contents +=  '<p class="comment-text">' + newComment.noiDung + '</p>';
-                    contents +=  '</div>';
-                    contents +=  '</div>';
-                    contents +=  '<div class="bg-white">';
-                    contents +=  '<div class="d-flex flex-row fs-12">';
-                    contents +=  '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
-                    contents +=  '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
-                    contents += '<div onclick="ReportThisComment(' + newComment.id +')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
-
-                    contents +=  '</div>';
-
-                    // List all reply comment relate to this comment
-                    contents += '<div style="margin-left: 50px;" id= ' + ("listreplyto" + newComment.id) + '></div>';
-
-                    // Add reply comment section
-                    contents +=  '<div id=' + replyId +' style="display: none;">';
-
-                    // Nơi viết comment
-                    contents +=  '<form method="post">';
-                    contents +=  '<div class="bg-light p-2">';
-                    contents +=  '<div class="d-flex flex-row align-items-start">';
-                    contents +=  '<img class="rounded-circle" src="/images/'+ res.loggedUserAvatar +'" width="40">';
-                    contents +=  '<textarea id='+ ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
-                    contents +=   '</textarea>';
-                    contents +=   '</div>';
-                    contents +=   '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                    contents +=   '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
-                    contents +=   '<div class="col-lg-5">Cancel</div></div>';
-                    contents +=   '</div>';
-                    contents +=   '</form>';
+                url: "/Home/SaveCommentOnPost",
+                dataType: 'json',
+                type: 'post',
+                data: { postId: postId, content: content },
+                success: function(res) {
+                    if (res.status == "ok") {
+                        // Lấy số bình luận hiện tại và tăng lên 1
+                        // khi người dùng thực hiện bình luận
+                        var numOfBinhLuan = $('#numbersOfBinhLuan' + postId).html();
+                        var recentNumOfBinhLuan = eval(numOfBinhLuan) + 1;
+                        console.log('so binh luan hien tai: ' + recentNumOfBinhLuan);
+                        $('#numbersOfBinhLuan' + postId).html(recentNumOfBinhLuan);
 
 
-                    contents +=  '</div>';
+                        console.log("ok");
+                        var newComment = res.result;
+                        console.log(newComment);
+                        var contents = "";
 
-                    $('#commentOnPost').val("");
-                    $('#listComment').append(contents);
-                }else {
-                    console.log("err");
+                        // Change create At to nicer formata
+                        var d = new Date(newComment.ngayDang);
+                        var timeCreate = d.toLocaleString("en-US");
+
+                        // Generate id for reply section
+                        var replyId = "reply" + newComment.id;
+
+                        contents += '<div class="bg-white p-2">';
+                        contents += '<div class="d-flex flex-row user-info">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.avatarOfUserWriteThisComment + '" width="40">';
+                        contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">' + res.nameOfUserWriteThisComment + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
+                        contents += '</div>';
+                        contents += '<div class="mt-2">';
+                        contents += '<p class="comment-text">' + newComment.noiDung + '</p>';
+                        contents += '</div>';
+                        contents += '</div>';
+                        contents += '<div class="bg-white">';
+                        contents += '<div class="d-flex flex-row fs-12">';
+                        contents += '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                        contents += '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                        contents += '<div onclick="ReportThisComment(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
+
+                        contents += '</div>';
+
+                        // List all reply comment relate to this comment
+                        contents += '<div style="margin-left: 50px;" id= ' + ("listreplyto" + newComment.id) + '></div>';
+
+                        // Add reply comment section
+                        contents += '<div id=' + replyId + ' style="display: none;">';
+
+                        // Nơi viết comment
+                        contents += '<form method="post">';
+                        contents += '<div class="bg-light p-2">';
+                        contents += '<div class="d-flex flex-row align-items-start">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40">';
+                        contents += '<textarea id=' + ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
+                        contents += '</textarea>';
+                        contents += '</div>';
+                        contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
+                        contents += '<div class="col-lg-5">Cancel</div></div>';
+                        contents += '</div>';
+                        contents += '</form>';
+
+
+                        contents += '</div>';
+
+                        $('#commentOnPost').val("");
+                        $('#listComment').append(contents);
+                    } else {
+                        console.log("err");
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
                 }
-            },
-            error: function(err){
-                console.log(err);
-            }
             });
     }
 
 
-    function PostCommentOnComment(id){
+    function PostCommentOnComment(id) {
         var postId = @Model.Id;
         var content = $('#commentOnComment' + id).val();
 
         $.ajax(
             {
-            url: "/Home/SaveCommentOnComment",
-            dataType: 'json',
-            type: 'post',
-            data: {postId: postId, content: content, parentCmtId: id},
-            success: function(res){
-                if(res.status == "ok"){
-                    console.log("ok");
-                    var newComment = res.result;
-                    // Get user that this comment reply to
-                    var userReply = res.replyUserName;
-                    // Get rootId of this comment
-                    var rootId = res.rootId;
+                url: "/Home/SaveCommentOnComment",
+                dataType: 'json',
+                type: 'post',
+                data: { postId: postId, content: content, parentCmtId: id },
+                success: function(res) {
+                    if (res.status == "ok") {
+                        console.log("ok");
 
-                    console.log(newComment);
-                    var contents = "";
-
-                    // Change create At to nicer formata
-                    var d = new Date(newComment.ngayDang);
-                    var timeCreate = d.toLocaleString("en-US");
-
-                    // Generate id for reply section
-                    var replyId = "reply" + newComment.id;
-
-                    contents += '<div class="bg-white p-2">';
-                    contents += '<div class="d-flex flex-row user-info">';
-                    contents += '<img class="rounded-circle" src="/images/'+ res.avatarOfUserWriteThisComment +'" width="40">';
-                    contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">'+ res.nameOfUserWriteThisComment +'</span><span class="date text-black-50">Shared publicly - '+ timeCreate +'</span></div>';
-                    contents +=  '</div>';
-                    contents +=  '<div class="mt-2">';
-                    contents +=  '<p class="comment-text">' + '@@' + userReply + ' - '  + newComment.noiDung + '</p>';
-                    contents +=  '</div>';
-                    contents +=  '</div>';
-                    contents +=  '<div class="bg-white">';
-                    contents +=  '<div class="d-flex flex-row fs-12">';
-                    contents +=  '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
-                    contents +=  '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
-                    contents +=  '<div style="cursor: pointer;" onclick="ReportThisComment(' + newComment.id +')" class="like p-2 cursor"><i class="fa fa-share"></i><span class="ml-1">Report</span></div>';
-
-                    contents +=  '</div>';
-
-                    // Add reply comment section
-                    contents +=  '<div id=' + replyId +' style="display: none;">';
-
-                    // Nơi viết comment
-                    contents +=  '<form method="post">';
-                    contents +=  '<div class="bg-light p-2">';
-                    contents +=  '<div class="d-flex flex-row align-items-start">';
-                    contents +=  '<img class="rounded-circle" src="/images/'+ res.loggedUserAvatar +'" width="40">';
-                    contents +=  '<textarea id='+ ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
-                    contents +=   '</textarea>';
-                    contents +=   '</div>';
-                    contents +=   '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                    contents +=   '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
-                    contents +=   '<div class="col-lg-5">Cancel</div></div>';
-                    contents +=   '</div>';
-                    contents +=   '</form>';
+                        // Lấy số bình luận hiện tại và tăng lên 1
+                        // khi người dùng thực hiện bình luận
+                        var numOfBinhLuan = $('#numbersOfBinhLuan' + postId).html();
+                        var recentNumOfBinhLuan = eval(numOfBinhLuan) + 1;
+                        console.log('so binh luan hien tai: ' + recentNumOfBinhLuan);
+                        $('#numbersOfBinhLuan' + postId).html(recentNumOfBinhLuan);
 
 
-                    contents +=  '</div>';
+                        var newComment = res.result;
+                        // Get user that this comment reply to
+                        var userReply = res.replyUserName;
+                        // Get rootId of this comment
+                        var rootId = res.rootId;
 
-                    $('#commentOnComment' + id).val("");
-                    $('#listreplyto' + rootId).append(contents);
-                }else {
-                    console.log("err");
+                        console.log(newComment);
+                        var contents = "";
+
+                        // Change create At to nicer formata
+                        var d = new Date(newComment.ngayDang);
+                        var timeCreate = d.toLocaleString("en-US");
+
+                        // Generate id for reply section
+                        var replyId = "reply" + newComment.id;
+
+                        contents += '<div class="bg-white p-2">';
+                        contents += '<div class="d-flex flex-row user-info">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.avatarOfUserWriteThisComment + '" width="40">';
+                        contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">' + res.nameOfUserWriteThisComment + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
+                        contents += '</div>';
+                        contents += '<div class="mt-2">';
+                        contents += '<p class="comment-text">' + '@@' + userReply + ' - ' + newComment.noiDung + '</p>';
+                        contents += '</div>';
+                        contents += '</div>';
+                        contents += '<div class="bg-white">';
+                        contents += '<div class="d-flex flex-row fs-12">';
+                        contents += '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                        contents += '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                        contents += '<div style="cursor: pointer;" onclick="ReportThisComment(' + newComment.id + ')" class="like p-2 cursor"><i class="fa fa-share"></i><span class="ml-1">Report</span></div>';
+
+                        contents += '</div>';
+
+                        // Add reply comment section
+                        contents += '<div id=' + replyId + ' style="display: none;">';
+
+                        // Nơi viết comment
+                        contents += '<form method="post">';
+                        contents += '<div class="bg-light p-2">';
+                        contents += '<div class="d-flex flex-row align-items-start">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40">';
+                        contents += '<textarea id=' + ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
+                        contents += '</textarea>';
+                        contents += '</div>';
+                        contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
+                        contents += '<div class="col-lg-5">Cancel</div></div>';
+                        contents += '</div>';
+                        contents += '</form>';
+
+
+                        contents += '</div>';
+
+                        $('#commentOnComment' + id).val("");
+                        $('#listreplyto' + rootId).append(contents);
+                    } else {
+                        console.log("err");
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
                 }
-            },
-            error: function(err){
-                console.log(err);
-            }
             });
     }
 
@@ -450,12 +491,98 @@
                 dataType: 'json',
                 type: 'post',
                 data: { id: parentCommentId },
-                success: function (res) {
+                success: function(res) {
                     console.log(res);
                 },
-                error: function (err) {
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+    }
+
+    function QuanTam(id) {
+        var isSaved = $('#isQuanTamPhongTro' + id).html();
+        console.log(isSaved);
+
+        var numOfLike = $('#numbersOfLike' + id).html();
+        console.log('numbers of like: ' + numOfLike);
+
+        if (isSaved.trim() == "Quan tâm") {
+            console.log('Đang quan tâm phòng trọ ' + id);
+            $.ajax({
+                url: '/Home/QuanTamPhongTro',
+                method: 'post',
+                data: { id: id },
+                success: function(result) {
+                    if (result.status == "ok") {
+                        console.log('Đã quan tâm phòng trọ ' + id);
+                        $('#isQuanTamPhongTro' + id).html('Đã quan tâm');
+
+                        // Tăng số lượng like lên 1 đơn vị
+                        var recentNumOfLike = eval(numOfLike) + 1;
+                        console.log('so like hien tai: ' + recentNumOfLike);
+                        $('#numbersOfLike' + id).html(recentNumOfLike);
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        } else {
+            console.log('Đang bỏ quan tâm phòng trọ ' + id);
+            $.ajax({
+                url: '/Home/BoQuanTamPhongTro',
+                method: 'post',
+                data: { id: id },
+                success: function(result) {
+                    if (result.status == "ok") {
+                        console.log('Đã bỏ quan tâm phòng trọ ' + id);
+                        $('#isQuanTamPhongTro' + id).html('Quan tâm');
+
+                        // Giảm số lượng like lên 1 đơn vị
+                        var recentNumOfLike = eval(numOfLike) - 1;
+                        console.log('so like hien tai: ' + recentNumOfLike);
+                        $('#numbersOfLike' + id).html(recentNumOfLike);
+                    }
+                },
+                error: function(err) {
                     console.log(err);
                 }
             });
         }
+    }
+
+    function Save(id) {
+        var isSaved = $('#isSavedPhongTro' + id).html();
+        console.log(isSaved);
+        if (isSaved.trim() == "Lưu") {
+            $.ajax({
+                url: '/Home/SavePhongTro',
+                method: 'post',
+                data: { id: id },
+                success: function(result) {
+                    if (result.status == "ok") {
+                        $('#isSavedPhongTro' + id).html('Đã lưu');
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        } else {
+            $.ajax({
+                url: '/Home/UnSavePhongTro',
+                method: 'post',
+                data: { id: id },
+                success: function(result) {
+                    if (result.status == "ok") {
+                        $('#isSavedPhongTro' + id).html('Lưu');
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        }
+    }
 </script>

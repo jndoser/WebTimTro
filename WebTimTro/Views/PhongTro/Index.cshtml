@@ -1,7 +1,22 @@
-﻿
+﻿@using Microsoft.AspNetCore.Identity
+@using WebTimTro.Data
+@inject SignInManager<NguoiDung> SignInManager
+@inject UserManager<NguoiDung> UserManager
+
 @{
     ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    if (SignInManager.IsSignedIn(User))
+    {
+        if (User.IsInRole("Chutro"))
+        {
+            Layout = "~/Views/Shared/_Layout.cshtml";
+        } else
+        {
+            Layout = "~/Views/Shared/_AdminLayout.cshtml";
+        }
+    }
+    
 }
 
 <div class="card" style="margin-left: 50px; margin-right: 50px; margin-top: 30px;">

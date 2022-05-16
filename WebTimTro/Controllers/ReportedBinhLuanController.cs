@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using WebTimTro.Models;
 
 namespace WebTimTro.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class ReportedBinhLuanController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

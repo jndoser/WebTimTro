@@ -156,5 +156,12 @@ namespace WebTimTro.Repository
         {
             return _context.BinhLuans.Where(x => x.IsReported == true).ToList();
         }
+
+        // Count numbers of comment in a post
+        public int GetNumbersOfCommentByPostId(int postId)
+        {
+            return _context.BinhLuans
+                .Where(x => x.PhongTroId == postId && x.IsShow == true).Count();
+        }
     }
 }
