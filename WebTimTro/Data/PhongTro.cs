@@ -19,6 +19,7 @@ namespace WebTimTro.Data
 
         public decimal Longitude { get; set; }
         public decimal Latitude { get; set; }
+        public string District { get; set; }
 
         // 1 phòng trọ do 1 chủ trọ tạo
         public string ChuTroId { get; set; }

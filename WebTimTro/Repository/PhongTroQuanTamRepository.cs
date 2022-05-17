@@ -40,5 +40,19 @@ namespace WebTimTro.Repository
                 .Where(x => x.PhongTroId == phongTroId)
                 .Count();
         }
+
+        // Count numbers of care in a post
+        public int GetNumbersOfCareByPostId(params int[] postId)
+        {
+            int tongQuanTam = 0;
+            foreach (var id in postId)
+            {
+                int soQuanTam = _context.PhongTroQuanTams
+                .Where(x => x.PhongTroId == id).Count();
+
+                tongQuanTam += soQuanTam;
+            }
+            return tongQuanTam;
+        }
     }
 }

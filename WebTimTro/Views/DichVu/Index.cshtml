@@ -8,6 +8,10 @@
 <div class="row" style="margin: 20px 5px 20px 5px; ">
     <div class="col-xl">
         <div class="card mb-4">
+            <div class="input-group" style="width:600px; margin:20px;">
+                <input type="text" class="form-control txtSearch" placeholder="Nhập vào tên dịch vụ bạn muốn tìm kiếm" aria-label="Ten chu tro" aria-describedby="search">
+                <button class="btn btn-outline-primary" type="button" id="search">Tìm kiếm</button>
+            </div>
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Danh sách các dịch vụ hiện tại</h5>
                 <small class="text-muted float-end" style="cursor: pointer;" onclick="ChangeToCreate()">Thêm dịch vụ</small>
@@ -212,15 +216,14 @@
         });
 
         // Click event search
-        //$('#search').click(function() {
-        //    var txtSearch = $('.txtSearch').val();
-        //    if(txtSearch != ''){
-        //        load(txtSearch, 1);
-        //    } else {
-        //        load(null, 1);
-        //        }
-        //    });
-        //});
+        $('#search').click(function() {
+            var txtSearch = $('.txtSearch').val();
+            if(txtSearch != ''){
+                load(txtSearch, 1);
+            } else {
+                load(null, 1);
+                }
+            });
 
         // Load init
         load(null, 1);

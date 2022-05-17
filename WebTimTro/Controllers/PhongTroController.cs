@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using WebTimTro.Data;
+using WebTimTro.Helpers;
 using WebTimTro.Interfaces;
 using WebTimTro.Models;
 
@@ -231,8 +232,21 @@ namespace WebTimTro.Controllers
             var data = _unitOfWork.PhongTro.GetAll();
             if (!string.IsNullOrEmpty(txtSearch))
             {
-                ViewBag.txtSearch = txtSearch;
-                data = data.Where(x => x.Ten.Contains(txtSearch));
+                long sucChua = 0;
+                long gia = 0;
+                if(long.TryParse(txtSearch, out sucChua) && long.TryParse(txtSearch, out gia))
+                {
+                    ViewBag.txtSearch = txtSearch;
+                    data = data.Where(x => x.Ten.ToLower().Contains(txtSearch.ToLower())
+                    || x.DiaChi.ToLower().Contains(txtSearch.ToLower())
+                    || x.SucChua == sucChua
+                    || x.Gia == gia);
+                } else
+                {
+                    ViewBag.txtSearch = txtSearch;
+                    data = data.Where(x => x.Ten.ToLower().Contains(txtSearch.ToLower())
+                    || x.DiaChi.ToLower().Contains(txtSearch.ToLower()));
+                }         
             }
             if(page > 0)
             {
@@ -287,9 +301,15 @@ namespace WebTimTro.Controllers
 
         // Update lại dữ liệu phòng trọ
         [HttpPost]
-        public IActionResult UpdatePhongTro(List<int> dichVu, PhongTroVM phongTro,
+        public JsonResult UpdatePhongTro(List<int> dichVu, PhongTroVM phongTro,
             NoteVM ghiChu, List<string> uploadedFilenames)
         {
+            if(phongTro.District == null)
+            {
+                phongTro.District = LocationHelper
+                    .GetDistrictFromAddress(phongTro.DiaChi);
+            }
+
             // Lưu lại dữ liệu phòng trọ
             // Đầu tiên lấy id hiện tại của chủ trọ đang đăng nhập 
             var userId = _unitOfWork.NguoiDung.GetUserId();
@@ -375,7 +395,7 @@ namespace WebTimTro.Controllers
             _unitOfWork.Note.Update(ghiChuData);
             _unitOfWork.Save();
 
-            return RedirectToAction("Index");
+            return Json(new {status = "ok"});
         }
 
 
@@ -424,8 +444,22 @@ namespace WebTimTro.Controllers
             IEnumerable<PhongTro> data = _unitOfWork.PhongTro.GetPhongTrosByNguoiDungId(nguoiDungId);
             if (!string.IsNullOrEmpty(txtSearch))
             {
-                ViewBag.txtSearch = txtSearch;
-                data = data.Where(x => x.Ten.Contains(txtSearch));
+                long sucChua = 0;
+                long gia = 0;
+                if (long.TryParse(txtSearch, out sucChua) && long.TryParse(txtSearch, out gia))
+                {
+                    ViewBag.txtSearch = txtSearch;
+                    data = data.Where(x => x.Ten.ToLower().Contains(txtSearch.ToLower())
+                    || x.DiaChi.ToLower().Contains(txtSearch.ToLower())
+                    || x.SucChua == sucChua
+                    || x.Gia == gia);
+                }
+                else
+                {
+                    ViewBag.txtSearch = txtSearch;
+                    data = data.Where(x => x.Ten.ToLower().Contains(txtSearch.ToLower())
+                    || x.DiaChi.ToLower().Contains(txtSearch.ToLower()));
+                }
             }
             if (page > 0)
             {

@@ -8,5 +8,8 @@ namespace WebTimTro.Interfaces
             int phongTroId);
         public bool IsQuanTam(string nguoiDungId, int phongTroId);
         public int NumbersOfQuanTam(int phongTroId);
+
+        // Count numbers of care in a post
+        public int GetNumbersOfCareByPostId(params int[] postId);
     }
 }

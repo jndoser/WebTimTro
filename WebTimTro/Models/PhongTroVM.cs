@@ -19,6 +19,7 @@ namespace WebTimTro.Models
         public bool TrangThaiDang { get; set; } = true;
         public decimal Longitude { get; set; }
         public decimal Latitude { get; set; }
+        public string District { get; set; }
 
         public List<IFormFile> Files { get; set; }
     }

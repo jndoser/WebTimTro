@@ -54,7 +54,7 @@ namespace WebTimTro.Controllers
             if (!string.IsNullOrEmpty(txtSearch))
             {
                 ViewBag.txtSearch = txtSearch;
-                data = data.Where(x => x.NoiDung.Contains(txtSearch));
+                data = data.Where(x => x.NoiDung.ToLower().Contains(txtSearch.ToLower()));
             }
             if (page > 0)
             {

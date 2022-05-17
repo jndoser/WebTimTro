@@ -91,7 +91,7 @@
 
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
           <div class="app-brand demo">
-            <a href="index.html" class="app-brand-link">
+            <a href="/Home/Index" class="app-brand-link">
               <span class="app-brand-logo demo">
                 <svg
                   width="25"
@@ -197,6 +197,13 @@
               <a asp-controller="ReportedBinhLuan" asp-action="Index" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-no-entry"></i>
                 <div data-i18n="Boxicons">Duyệt bình luận báo cáo</div>
+              </a>
+            </li>
+
+            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("ThongKe") ? "active" : "")">
+              <a asp-controller="ThongKe" asp-action="Index" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-line-chart"></i>
+                <div data-i18n="Boxicons">Thống kê</div>
               </a>
             </li>
           </ul>

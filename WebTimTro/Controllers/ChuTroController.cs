@@ -47,7 +47,8 @@ namespace WebTimTro.Controllers
             if (!string.IsNullOrEmpty(txtSearch))
             {
                 ViewBag.txtSearch = txtSearch;
-                data = data.Where(x => x.LastName.Contains(txtSearch));
+                data = data.Where(x => (x.FirstName + " " + x.MiddleName + " " + x.LastName)
+                .ToLower().Contains(txtSearch.ToLower()));
             }
             if (page > 0)
             {

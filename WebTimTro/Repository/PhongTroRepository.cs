@@ -43,5 +43,26 @@ namespace WebTimTro.Repository
 
             return result;
         }
+
+        // Lấy ra số lượng các phòng trọ thuộc địa điểm được truyền vào
+        public int GetSoPhongTroThuocDiaDiem(string diaDiem)
+        {
+            return _context.PhongTros
+                .Where(x => x.DiaChi.Contains(diaDiem)).Count();
+        }
+
+        // Lấy ra id các phòng trọ thuộc địa điểm được truyền vào
+        public List<int> GetPhongTroIdsThuocDiaDiem(string diaDiem)
+        {
+            List<int> result = new List<int>();
+            var phongTroIds = _context.PhongTros
+                .Where(x => x.District.Equals(diaDiem)).Select(x => x.Id);
+
+            foreach(var id in phongTroIds)
+            {
+                result.Add(id);
+            }
+            return result;
+        }
     }
 }

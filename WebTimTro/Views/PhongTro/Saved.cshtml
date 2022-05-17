@@ -5,6 +5,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section Search
+{
+    <div class="input-group" style="width:600px; margin:20px;">
+        <input type="text" class="form-control txtSearch" placeholder="Nhập vào tên dịch vụ bạn muốn tìm kiếm" aria-label="Ten chu tro" aria-describedby="search">
+        <button class="btn btn-outline-primary" type="button" id="search">Tìm kiếm</button>
+    </div>
+}
+
 <div class="card" style="margin-left: 50px; margin-right: 50px; margin-top: 30px;">
     <h5 class="card-header">Các phòng trọ bạn đã lưu</h5>
     <div class="table-responsive text-nowrap">
@@ -207,15 +215,14 @@
         });
 
         // Click event search
-        //$('#search').click(function() {
-        //    var txtSearch = $('.txtSearch').val();
-        //    if(txtSearch != ''){
-        //        load(txtSearch, 1);
-        //    } else {
-        //        load(null, 1);
-        //        }
-        //    });
-        //});
+        $('#search').click(function() {
+            var txtSearch = $('.txtSearch').val();
+            if(txtSearch != ''){
+                load(txtSearch, 1);
+            } else {
+                load(null, 1);
+                }
+            });
 
         // Load init
         load(null, 1);

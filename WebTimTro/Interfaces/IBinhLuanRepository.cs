@@ -43,5 +43,8 @@ namespace WebTimTro.Interfaces
 
         // Count numbers of comment in a post
         public int GetNumbersOfCommentByPostId(int postId);
+
+        // Count numbers of comment in a post
+        public int GetNumbersOfCommentByPostId(params int[] postId);
     }
 }
