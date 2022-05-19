@@ -9,6 +9,7 @@
 </div>
 
 
+
 <script>
     goongjs.accessToken = 'TNwi4dTRydZLkZeH6Gi78EXYlpTYZ0qRuntr1LPY';
     var map = new goongjs.Map({
@@ -32,18 +33,47 @@
         var geo = e.result.result.geometry.location;
         console.log(e);
         console.log(geo);
-        var marker = new goongjs.Marker({
-        draggable: true
-        })
-        .setLngLat([geo.lng, geo.lat])
-        .addTo(map);
 
-        function onDragEnd() {
-            var lngLat = marker.getLngLat();
-                console.log('drag to: ' + lngLat.lng + ':' + lngLat.lat);
+        var marker = new goongjs.Marker({
+            draggable: true
+        }).setLngLat([geo.lng, geo.lat])
+            .addTo(map);
+
+        $.ajax({
+            url: '/TimKiem/GetPhongTroNearby',
+            method: 'get',
+            data: { lat: geo.lat, lng: geo.lng },
+            success: function(result) {
+                if (result.status == "ok") {
+                    console.log('ok');
+                    console.log('du lieu phong tro: ' + result.phongTros);
+                    console.log('du lieu khoang cach: ' + result.khoangCachs);
+                    $.each(result.khoangCachs, function(index, value) {
+                        if (value <= 1000) {
+
+                            // create the popup
+                            var popup = new goongjs.Popup({ offset: 25 }).setHTML(
+                                '<h5>' + result.phongTros[index].ten + '</h5>'
+                                + '<p> Sô người ở: ' + result.phongTros[index].sucChua + '</p>'
+                                + '<p> Giá: ' + result.phongTros[index].gia + '</p>'
+                                + '<p> Khoảng cách đến vị trí của bạn: ' + value + ' m</p>'
+                                + '<a href="/Home/Detail/'+ result.phongTros[index].id +'">Xem phòng trọ</a>'
+                            );
+
+                            var marker = new goongjs.Marker({
+                                color: '#cd7d96'
+                            })
+                                .setLngLat([result.phongTros[index].longitude, result.phongTros[index].latitude])
+                                .setPopup(popup)
+                                .addTo(map);
+                            }
+                    });
+                }
+            },
+            error: function(err) {
+                console.log(err);
             }
- 
-        marker.on('dragend', onDragEnd);
+        });
     });
 
 </script>
