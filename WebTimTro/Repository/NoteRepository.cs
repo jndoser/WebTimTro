@@ -43,8 +43,9 @@ namespace WebTimTro.Repository
         {
             int noteId = _context.PhongTroNotes
                 .FirstOrDefault(x => x.PhongTroId == phongTroId).NoteId;
-
-            return _context.Notes.FirstOrDefault(x => x.Id == noteId).Ten;
+            Note note = _context.Notes.FirstOrDefault(x => x.Id == noteId);
+            return note.Ten + "\n" 
+                + note.NoiDung;
         }
     }
 }

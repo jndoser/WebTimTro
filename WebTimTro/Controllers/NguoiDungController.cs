@@ -150,7 +150,7 @@ namespace WebTimTro.Controllers
                 if (file.Length > 0)
                 {
                     string fileName = file.FileName;
-                    path = Path.Combine(_env.WebRootPath, "assets/images");
+                    path = Path.Combine(_env.WebRootPath, "images");
                     using (var filestream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
                     {
                         await file.CopyToAsync(filestream);

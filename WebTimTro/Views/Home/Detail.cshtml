@@ -1,5 +1,9 @@
 ﻿@model WebTimTro.Models.PhongTroVM
 @inject WebTimTro.Interfaces.IUnitOfWork _unitOfWork
+@using Microsoft.AspNetCore.Identity
+@using WebTimTro.Data
+@inject SignInManager<NguoiDung> SignInManager
+@inject UserManager<NguoiDung> UserManager
 
 @{
     ViewData["Title"] = "Detail";
@@ -9,6 +13,7 @@
     List<DichVuVM> dichVusVM = ViewBag.DichVuCuaPhongTro;
 }
 
+<input hidden id="loginStatus" value="@(SignInManager.IsSignedIn(User) ? 1 : 0)" />
 <div class="card-group mb-5" style="margin-left:75px; margin-top:20px;">
     <div class="row" style="margin-left:30px;">
         @if (hinhAnhFileNames.Count != 0)
@@ -94,7 +99,7 @@
                        onclick="QuanTam(@(Model.Id))" class="card-link col-lg-4 bx bx-like">
                         @((_unitOfWork.PhongTroQuanTam.IsQuanTam(_unitOfWork.NguoiDung.GetUserId(), Model.Id)) ? "Đã quan tâm" : "Quan tâm")
                     </a>
-                    
+
                     <a id="isSavedPhongTro@(Model.Id)" style="cursor:pointer;"
                        onclick="Save(@(Model.Id))" class="card-link col-lg-3 bx bx-save">
                         @((_unitOfWork.PhongTroLuuTru.IsSaved(_unitOfWork.NguoiDung.GetUserId(), Model.Id)) ? "Đã lưu" : "Lưu")
@@ -114,17 +119,7 @@
             <a href="javascript:void(0)" class="card-link">Kiểm tra tình trạng trọ</a>
         </div>
         <div class="card-body">
-            <div class="card bg-dark border-0 text-white">
-                <img class="card-img" src="/images/duck.jpg" alt="Card image">
-                <div class="card-img-overlay">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">
-                        This is a wider card with supporting text below as a natural lead-in to additional content. This
-                        content is a little bit longer.
-                    </p>
-                    <p class="card-text">Last updated 3 mins ago</p>
-                </div>
-            </div>
+            <div id='map' style='width: 100%; height: 500px;'></div>
         </div>
     </div>
     <div class="card mb-4 col-7">
@@ -134,20 +129,28 @@
                 <div class="col-md-8">
                     <div class="d-flex flex-column comment-section">
                         <!--Nơi viết comment-->
-                        <form method="post">
-                            <div class="bg-light p-2">
-                                <div class="d-flex flex-row align-items-start">
-                                    <img class="rounded-circle" src="~/images/@@loggedUserAvatar" width="40">
-                                    @*<textarea id="commentOnPost" class="form-control ml-1 shadow-none textarea">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <form method="post">
+                                <div class="bg-light p-2">
+                                    <div class="d-flex flex-row align-items-start">
+                                        <img class="rounded-circle" src="~/images/@(_unitOfWork.NguoiDung.GetUserById(_unitOfWork.NguoiDung.GetUserId()).Avatar)" width="40" height="40">
+                                        @*<textarea id="commentOnPost" class="form-control ml-1 shadow-none textarea">
                                     </textarea>*@
-                                    <textarea class="form-control" id="commentOnPost" rows="3"></textarea>
+                                        <textarea style="margin-left:20px;" class="form-control" id="commentOnPost" rows="3"></textarea>
+                                    </div>
+                                    <div class="row" style="margin-left:20px;margin-top:5px;">
+                                        <div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnPost()">post it</div>
+                                        <div class="col-lg-5" style="cursor:pointer;" onclick="CancelComment()">cancel</div>
+                                    </div>
                                 </div>
-                                <div class="row" style="margin-left:20px;margin-top:5px;">
-                                    <div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnPost()">post it</div>
-                                    <div class="col-lg-5" style="cursor:pointer;" onclick="CancelComment()">cancel</div>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        }
+                        else
+                        {
+                            <div>Bạn hãy đăng nhập để bình luận bài viết</div>
+                        }
+
                         <div id="listComment">
                         </div>
                     </div>
@@ -159,9 +162,41 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(LoadComments());
+<!--Modal hiển thị để thông báo cho người dùng-->
+<div class="modal fade show" id="messageModal" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalToggleLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Bạn hãy đăng nhập để thực hiện tính năng này</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script>
+    //$(document).ready();
+    $(function() {
+        LoadComments();
+
+        goongjs.accessToken = 'TNwi4dTRydZLkZeH6Gi78EXYlpTYZ0qRuntr1LPY';
+        var map = new goongjs.Map({
+            container: 'map',
+            style: 'https://tiles.goong.io/assets/goong_map_web.json', // stylesheet location
+            center: [@Model.Longitude, @Model.Latitude], // starting position [lng, lat]
+            zoom: 15 // starting zoom
+        });
+
+        var marker = new goongjs.Marker()
+            .setLngLat([@Model.Longitude, @Model.Latitude])
+            .addTo(map);
+    });
     function LoadComments() {
         var postId = @Model.Id;
         $.ajax(
@@ -182,8 +217,8 @@
 
                         contents += '<div class="bg-white p-2">';
                         contents += '<div class="d-flex flex-row user-info">';
-                        contents += '<img class="rounded-circle" src="/images/' + res.listAvatar[index] + '" width="40">';
-                        contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">' + res.listAuthorName[index] + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
+                        contents += '<img class="rounded-circle" src="/images/' + res.listAvatar[index] + '" width="40" height="40">';
+                        contents += '<div class="d-flex flex-column justify-content-start ml-2" style="margin-left:20px;"><span class="d-block font-weight-bold name">' + res.listAuthorName[index] + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
                         contents += '</div>';
                         contents += '<div class="mt-2">';
                         contents += '<p class="comment-text">' + element.noiDung + '</p>';
@@ -207,8 +242,8 @@
                         contents += '<form method="post">';
                         contents += '<div class="bg-light p-2">';
                         contents += '<div class="d-flex flex-row align-items-start">';
-                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40">';
-                        contents += '<textarea id=' + ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40" height="40">';
+                        contents += '<textarea style="margin-left:20px;" id=' + ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
                         contents += '</textarea>';
                         contents += '</div>';
                         contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
@@ -252,8 +287,8 @@
 
                         contents += '<div class="bg-white p-2" style="backgroud-color: gray;">';
                         contents += '<div class="d-flex flex-row user-info">';
-                        contents += '<img class="rounded-circle" src="/images/' + res.listAvatar[index] + '" width="40">';
-                        contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">' + res.listAuthorName[index] + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
+                        contents += '<img class="rounded-circle" src="/images/' + res.listAvatar[index] + '" width="40" height="40">';
+                        contents += '<div class="d-flex flex-column justify-content-start ml-2" style="margin-left:20px;"><span class="d-block font-weight-bold name">' + res.listAuthorName[index] + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
                         contents += '</div>';
                         contents += '<div class="mt-2">';
                         contents += '<p class="comment-text">' + '@@' + replyUsers[index] + ' - ' + element.noiDung + '</p>';
@@ -275,8 +310,8 @@
                         contents += '<form method="post">';
                         contents += '<div class="bg-light p-2">';
                         contents += '<div class="d-flex flex-row align-items-start">';
-                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40">';
-                        contents += '<textarea id=' + ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
+                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40" height="40">';
+                        contents += '<textarea style="margin-left:20px;" id=' + ("commentOnComment" + element.id) + ' class="form-control ml-1 shadow-none textarea">';
                         contents += '</textarea>';
                         contents += '</div>';
                         contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
@@ -312,277 +347,302 @@
     }
 
     function PostCommentOnPost() {
-        var postId = @Model.Id;
-        var content = $("#commentOnPost").val();
+        var loginStatus = $('#loginStatus').val();
+        if (loginStatus == 0) {
+            $('#messageModal').modal('show');
+        } else {
+            var postId = @Model.Id;
+            var content = $("#commentOnPost").val();
 
-        $.ajax(
-            {
-                url: "/Home/SaveCommentOnPost",
-                dataType: 'json',
-                type: 'post',
-                data: { postId: postId, content: content },
-                success: function(res) {
-                    if (res.status == "ok") {
-                        // Lấy số bình luận hiện tại và tăng lên 1
-                        // khi người dùng thực hiện bình luận
-                        var numOfBinhLuan = $('#numbersOfBinhLuan' + postId).html();
-                        var recentNumOfBinhLuan = eval(numOfBinhLuan) + 1;
-                        console.log('so binh luan hien tai: ' + recentNumOfBinhLuan);
-                        $('#numbersOfBinhLuan' + postId).html(recentNumOfBinhLuan);
-
-
-                        console.log("ok");
-                        var newComment = res.result;
-                        console.log(newComment);
-                        var contents = "";
-
-                        // Change create At to nicer formata
-                        var d = new Date(newComment.ngayDang);
-                        var timeCreate = d.toLocaleString("en-US");
-
-                        // Generate id for reply section
-                        var replyId = "reply" + newComment.id;
-
-                        contents += '<div class="bg-white p-2">';
-                        contents += '<div class="d-flex flex-row user-info">';
-                        contents += '<img class="rounded-circle" src="/images/' + res.avatarOfUserWriteThisComment + '" width="40">';
-                        contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">' + res.nameOfUserWriteThisComment + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
-                        contents += '</div>';
-                        contents += '<div class="mt-2">';
-                        contents += '<p class="comment-text">' + newComment.noiDung + '</p>';
-                        contents += '</div>';
-                        contents += '</div>';
-                        contents += '<div class="bg-white">';
-                        contents += '<div class="d-flex flex-row fs-12">';
-                        contents += '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
-                        contents += '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
-                        contents += '<div onclick="ReportThisComment(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
-
-                        contents += '</div>';
-
-                        // List all reply comment relate to this comment
-                        contents += '<div style="margin-left: 50px;" id= ' + ("listreplyto" + newComment.id) + '></div>';
-
-                        // Add reply comment section
-                        contents += '<div id=' + replyId + ' style="display: none;">';
-
-                        // Nơi viết comment
-                        contents += '<form method="post">';
-                        contents += '<div class="bg-light p-2">';
-                        contents += '<div class="d-flex flex-row align-items-start">';
-                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40">';
-                        contents += '<textarea id=' + ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
-                        contents += '</textarea>';
-                        contents += '</div>';
-                        contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
-                        contents += '<div class="col-lg-5">Cancel</div></div>';
-                        contents += '</div>';
-                        contents += '</form>';
+            $.ajax(
+                {
+                    url: "/Home/SaveCommentOnPost",
+                    dataType: 'json',
+                    type: 'post',
+                    data: { postId: postId, content: content },
+                    success: function(res) {
+                        if (res.status == "ok") {
+                            // Lấy số bình luận hiện tại và tăng lên 1
+                            // khi người dùng thực hiện bình luận
+                            var numOfBinhLuan = $('#numbersOfBinhLuan' + postId).html();
+                            var recentNumOfBinhLuan = eval(numOfBinhLuan) + 1;
+                            console.log('so binh luan hien tai: ' + recentNumOfBinhLuan);
+                            $('#numbersOfBinhLuan' + postId).html(recentNumOfBinhLuan);
 
 
-                        contents += '</div>';
+                            console.log("ok");
+                            var newComment = res.result;
+                            console.log(newComment);
+                            var contents = "";
 
-                        $('#commentOnPost').val("");
-                        $('#listComment').append(contents);
-                    } else {
-                        console.log("err");
+                            // Change create At to nicer formata
+                            var d = new Date(newComment.ngayDang);
+                            var timeCreate = d.toLocaleString("en-US");
+
+                            // Generate id for reply section
+                            var replyId = "reply" + newComment.id;
+
+                            contents += '<div class="bg-white p-2">';
+                            contents += '<div class="d-flex flex-row user-info">';
+                            contents += '<img class="rounded-circle" src="/images/' + res.avatarOfUserWriteThisComment + '" width="40" height="40">';
+                            contents += '<div class="d-flex flex-column justify-content-start ml-2" style="margin-left:20px;"><span class="d-block font-weight-bold name">' + res.nameOfUserWriteThisComment + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
+                            contents += '</div>';
+                            contents += '<div class="mt-2">';
+                            contents += '<p class="comment-text">' + newComment.noiDung + '</p>';
+                            contents += '</div>';
+                            contents += '</div>';
+                            contents += '<div class="bg-white">';
+                            contents += '<div class="d-flex flex-row fs-12">';
+                            contents += '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                            contents += '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                            contents += '<div onclick="ReportThisComment(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor"><i class=""></i><span class="ml-1">Report</span></div>';
+
+                            contents += '</div>';
+
+                            // List all reply comment relate to this comment
+                            contents += '<div style="margin-left: 50px;" id= ' + ("listreplyto" + newComment.id) + '></div>';
+
+                            // Add reply comment section
+                            contents += '<div id=' + replyId + ' style="display: none;">';
+
+                            // Nơi viết comment
+                            contents += '<form method="post">';
+                            contents += '<div class="bg-light p-2">';
+                            contents += '<div class="d-flex flex-row align-items-start">';
+                            contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40" height="40">';
+                            contents += '<textarea style="margin-left:20px;" id=' + ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
+                            contents += '</textarea>';
+                            contents += '</div>';
+                            contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                            contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
+                            contents += '<div class="col-lg-5">Cancel</div></div>';
+                            contents += '</div>';
+                            contents += '</form>';
+
+
+                            contents += '</div>';
+
+                            $('#commentOnPost').val("");
+                            $('#listComment').append(contents);
+                        } else {
+                            console.log("err");
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
                     }
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
+                });
+        }
     }
 
 
     function PostCommentOnComment(id) {
-        var postId = @Model.Id;
-        var content = $('#commentOnComment' + id).val();
+        var loginStatus = $('#loginStatus').val();
+        if (loginStatus == 0) {
+            $('#messageModal').modal('show');
+        } else {
+            var postId = @Model.Id;
+            var content = $('#commentOnComment' + id).val();
 
-        $.ajax(
-            {
-                url: "/Home/SaveCommentOnComment",
-                dataType: 'json',
-                type: 'post',
-                data: { postId: postId, content: content, parentCmtId: id },
-                success: function(res) {
-                    if (res.status == "ok") {
-                        console.log("ok");
+            $.ajax(
+                {
+                    url: "/Home/SaveCommentOnComment",
+                    dataType: 'json',
+                    type: 'post',
+                    data: { postId: postId, content: content, parentCmtId: id },
+                    success: function(res) {
+                        if (res.status == "ok") {
+                            console.log("ok");
 
-                        // Lấy số bình luận hiện tại và tăng lên 1
-                        // khi người dùng thực hiện bình luận
-                        var numOfBinhLuan = $('#numbersOfBinhLuan' + postId).html();
-                        var recentNumOfBinhLuan = eval(numOfBinhLuan) + 1;
-                        console.log('so binh luan hien tai: ' + recentNumOfBinhLuan);
-                        $('#numbersOfBinhLuan' + postId).html(recentNumOfBinhLuan);
-
-
-                        var newComment = res.result;
-                        // Get user that this comment reply to
-                        var userReply = res.replyUserName;
-                        // Get rootId of this comment
-                        var rootId = res.rootId;
-
-                        console.log(newComment);
-                        var contents = "";
-
-                        // Change create At to nicer formata
-                        var d = new Date(newComment.ngayDang);
-                        var timeCreate = d.toLocaleString("en-US");
-
-                        // Generate id for reply section
-                        var replyId = "reply" + newComment.id;
-
-                        contents += '<div class="bg-white p-2">';
-                        contents += '<div class="d-flex flex-row user-info">';
-                        contents += '<img class="rounded-circle" src="/images/' + res.avatarOfUserWriteThisComment + '" width="40">';
-                        contents += '<div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">' + res.nameOfUserWriteThisComment + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
-                        contents += '</div>';
-                        contents += '<div class="mt-2">';
-                        contents += '<p class="comment-text">' + '@@' + userReply + ' - ' + newComment.noiDung + '</p>';
-                        contents += '</div>';
-                        contents += '</div>';
-                        contents += '<div class="bg-white">';
-                        contents += '<div class="d-flex flex-row fs-12">';
-                        contents += '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
-                        contents += '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
-                        contents += '<div style="cursor: pointer;" onclick="ReportThisComment(' + newComment.id + ')" class="like p-2 cursor"><i class="fa fa-share"></i><span class="ml-1">Report</span></div>';
-
-                        contents += '</div>';
-
-                        // Add reply comment section
-                        contents += '<div id=' + replyId + ' style="display: none;">';
-
-                        // Nơi viết comment
-                        contents += '<form method="post">';
-                        contents += '<div class="bg-light p-2">';
-                        contents += '<div class="d-flex flex-row align-items-start">';
-                        contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40">';
-                        contents += '<textarea id=' + ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
-                        contents += '</textarea>';
-                        contents += '</div>';
-                        contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
-                        contents += '<div class="col-lg-5">Cancel</div></div>';
-                        contents += '</div>';
-                        contents += '</form>';
+                            // Lấy số bình luận hiện tại và tăng lên 1
+                            // khi người dùng thực hiện bình luận
+                            var numOfBinhLuan = $('#numbersOfBinhLuan' + postId).html();
+                            var recentNumOfBinhLuan = eval(numOfBinhLuan) + 1;
+                            console.log('so binh luan hien tai: ' + recentNumOfBinhLuan);
+                            $('#numbersOfBinhLuan' + postId).html(recentNumOfBinhLuan);
 
 
-                        contents += '</div>';
+                            var newComment = res.result;
+                            // Get user that this comment reply to
+                            var userReply = res.replyUserName;
+                            // Get rootId of this comment
+                            var rootId = res.rootId;
 
-                        $('#commentOnComment' + id).val("");
-                        $('#listreplyto' + rootId).append(contents);
-                    } else {
-                        console.log("err");
+                            console.log(newComment);
+                            var contents = "";
+
+                            // Change create At to nicer formata
+                            var d = new Date(newComment.ngayDang);
+                            var timeCreate = d.toLocaleString("en-US");
+
+                            // Generate id for reply section
+                            var replyId = "reply" + newComment.id;
+
+                            contents += '<div class="bg-white p-2">';
+                            contents += '<div class="d-flex flex-row user-info">';
+                            contents += '<img class="rounded-circle" src="/images/' + res.avatarOfUserWriteThisComment + '" width="40" height="40">';
+                            contents += '<div class="d-flex flex-column justify-content-start ml-2" style="margin-left:20px;"><span class="d-block font-weight-bold name">' + res.nameOfUserWriteThisComment + '</span><span class="date text-black-50">Shared publicly - ' + timeCreate + '</span></div>';
+                            contents += '</div>';
+                            contents += '<div class="mt-2">';
+                            contents += '<p class="comment-text">' + '@@' + userReply + ' - ' + newComment.noiDung + '</p>';
+                            contents += '</div>';
+                            contents += '</div>';
+                            contents += '<div class="bg-white">';
+                            contents += '<div class="d-flex flex-row fs-12">';
+                            contents += '<div style="cursor: pointer;" class="like p-2 cursor"><i class="fa fa-thumbs-o-up"></i><span class="ml-1">Like</span></div>';
+                            contents += '<div onclick="ShowHideReply(' + newComment.id + ')" style="cursor: pointer;" class="like p-2 cursor" >Comment</div>';
+                            contents += '<div style="cursor: pointer;" onclick="ReportThisComment(' + newComment.id + ')" class="like p-2 cursor"><i class="fa fa-share"></i><span class="ml-1">Report</span></div>';
+
+                            contents += '</div>';
+
+                            // Add reply comment section
+                            contents += '<div id=' + replyId + ' style="display: none;">';
+
+                            // Nơi viết comment
+                            contents += '<form method="post">';
+                            contents += '<div class="bg-light p-2">';
+                            contents += '<div class="d-flex flex-row align-items-start">';
+                            contents += '<img class="rounded-circle" src="/images/' + res.loggedUserAvatar + '" width="40" height="40">';
+                            contents += '<textarea style="margin-left:20px;" id=' + ("commentOnComment" + newComment.id) + ' class="form-control ml-1 shadow-none textarea">';
+                            contents += '</textarea>';
+                            contents += '</div>';
+                            contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
+                            contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
+                            contents += '<div class="col-lg-5">Cancel</div></div>';
+                            contents += '</div>';
+                            contents += '</form>';
+
+
+                            contents += '</div>';
+
+                            $('#commentOnComment' + id).val("");
+                            $('#listreplyto' + rootId).append(contents);
+                        } else {
+                            console.log("err");
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
                     }
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
+                });
+        }
     }
 
     function ReportThisComment(id) {
-        var parentCommentId = id;
-        $.ajax(
-            {
-                url: "/Home/ReportCommentById",
-                dataType: 'json',
-                type: 'post',
-                data: { id: parentCommentId },
-                success: function(res) {
-                    console.log(res);
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
+        var loginStatus = $('#loginStatus').val();
+        if (loginStatus == 0) {
+            $('#messageModal').modal('show');
+        } else {
+            var parentCommentId = id;
+            $.ajax(
+                {
+                    url: "/Home/ReportCommentById",
+                    dataType: 'json',
+                    type: 'post',
+                    data: { id: parentCommentId },
+                    success: function(res) {
+                        console.log(res);
+                    },
+                    error: function(err) {
+                        console.log(err);
+                    }
+                });
+        }
     }
 
     function QuanTam(id) {
-        var isSaved = $('#isQuanTamPhongTro' + id).html();
-        console.log(isSaved);
-
-        var numOfLike = $('#numbersOfLike' + id).html();
-        console.log('numbers of like: ' + numOfLike);
-
-        if (isSaved.trim() == "Quan tâm") {
-            console.log('Đang quan tâm phòng trọ ' + id);
-            $.ajax({
-                url: '/Home/QuanTamPhongTro',
-                method: 'post',
-                data: { id: id },
-                success: function(result) {
-                    if (result.status == "ok") {
-                        console.log('Đã quan tâm phòng trọ ' + id);
-                        $('#isQuanTamPhongTro' + id).html('Đã quan tâm');
-
-                        // Tăng số lượng like lên 1 đơn vị
-                        var recentNumOfLike = eval(numOfLike) + 1;
-                        console.log('so like hien tai: ' + recentNumOfLike);
-                        $('#numbersOfLike' + id).html(recentNumOfLike);
-                    }
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
+        var loginStatus = $('#loginStatus').val();
+        if (loginStatus == 0) {
+            $('#messageModal').modal('show');
         } else {
-            console.log('Đang bỏ quan tâm phòng trọ ' + id);
-            $.ajax({
-                url: '/Home/BoQuanTamPhongTro',
-                method: 'post',
-                data: { id: id },
-                success: function(result) {
-                    if (result.status == "ok") {
-                        console.log('Đã bỏ quan tâm phòng trọ ' + id);
-                        $('#isQuanTamPhongTro' + id).html('Quan tâm');
+            var isSaved = $('#isQuanTamPhongTro' + id).html();
+            console.log(isSaved);
 
-                        // Giảm số lượng like lên 1 đơn vị
-                        var recentNumOfLike = eval(numOfLike) - 1;
-                        console.log('so like hien tai: ' + recentNumOfLike);
-                        $('#numbersOfLike' + id).html(recentNumOfLike);
+            var numOfLike = $('#numbersOfLike' + id).html();
+            console.log('numbers of like: ' + numOfLike);
+
+            if (isSaved.trim() == "Quan tâm") {
+                console.log('Đang quan tâm phòng trọ ' + id);
+                $.ajax({
+                    url: '/Home/QuanTamPhongTro',
+                    method: 'post',
+                    data: { id: id },
+                    success: function(result) {
+                        if (result.status == "ok") {
+                            console.log('Đã quan tâm phòng trọ ' + id);
+                            $('#isQuanTamPhongTro' + id).html('Đã quan tâm');
+
+                            // Tăng số lượng like lên 1 đơn vị
+                            var recentNumOfLike = eval(numOfLike) + 1;
+                            console.log('so like hien tai: ' + recentNumOfLike);
+                            $('#numbersOfLike' + id).html(recentNumOfLike);
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
                     }
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
+                });
+            } else {
+                console.log('Đang bỏ quan tâm phòng trọ ' + id);
+                $.ajax({
+                    url: '/Home/BoQuanTamPhongTro',
+                    method: 'post',
+                    data: { id: id },
+                    success: function(result) {
+                        if (result.status == "ok") {
+                            console.log('Đã bỏ quan tâm phòng trọ ' + id);
+                            $('#isQuanTamPhongTro' + id).html('Quan tâm');
+
+                            // Giảm số lượng like lên 1 đơn vị
+                            var recentNumOfLike = eval(numOfLike) - 1;
+                            console.log('so like hien tai: ' + recentNumOfLike);
+                            $('#numbersOfLike' + id).html(recentNumOfLike);
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
+                    }
+                });
+            }
         }
     }
 
     function Save(id) {
-        var isSaved = $('#isSavedPhongTro' + id).html();
-        console.log(isSaved);
-        if (isSaved.trim() == "Lưu") {
-            $.ajax({
-                url: '/Home/SavePhongTro',
-                method: 'post',
-                data: { id: id },
-                success: function(result) {
-                    if (result.status == "ok") {
-                        $('#isSavedPhongTro' + id).html('Đã lưu');
-                    }
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
+        var loginStatus = $('#loginStatus').val();
+        if (loginStatus == 0) {
+            $('#messageModal').modal('show');
         } else {
-            $.ajax({
-                url: '/Home/UnSavePhongTro',
-                method: 'post',
-                data: { id: id },
-                success: function(result) {
-                    if (result.status == "ok") {
-                        $('#isSavedPhongTro' + id).html('Lưu');
+            var isSaved = $('#isSavedPhongTro' + id).html();
+            console.log(isSaved);
+            if (isSaved.trim() == "Lưu") {
+                $.ajax({
+                    url: '/Home/SavePhongTro',
+                    method: 'post',
+                    data: { id: id },
+                    success: function(result) {
+                        if (result.status == "ok") {
+                            $('#isSavedPhongTro' + id).html('Đã lưu');
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
                     }
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
+                });
+            } else {
+                $.ajax({
+                    url: '/Home/UnSavePhongTro',
+                    method: 'post',
+                    data: { id: id },
+                    success: function(result) {
+                        if (result.status == "ok") {
+                            $('#isSavedPhongTro' + id).html('Lưu');
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
+                    }
+                });
+            }
         }
     }
 </script>

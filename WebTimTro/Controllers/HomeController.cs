@@ -51,6 +51,17 @@ namespace WebTimTro.Controllers
         public JsonResult GetAllPost(string txtSearch, int? page)
         {
             var data = _unitOfWork.PhongTro.GetAll();
+
+            // Định dạng lại độ dài của các trường dữ liệu để 
+            // qua view in ra được đồng bộ
+            foreach(var item in data)
+            {
+                if(item.Ten.Length > 30)
+                {
+                    item.Ten = item.Ten.Substring(0, 30) + "...";
+                }          
+            }
+
             if (!string.IsNullOrEmpty(txtSearch))
             {
                 ViewBag.txtSearch = txtSearch;
@@ -387,6 +398,17 @@ namespace WebTimTro.Controllers
             var data = _unitOfWork.PhongTro.GetAll()
                 .Where(x => x.DiaChi.Contains(searchOptions.KhuVuc) ||
                 x.Gia <= searchOptions.Gia || x.SucChua == searchOptions.SoNguoiO);
+
+
+            // Định dạng lại độ dài của các trường dữ liệu để 
+            // qua view in ra được đồng bộ
+            foreach (var item in data)
+            {
+                if (item.Ten.Length > 30)
+                {
+                    item.Ten = item.Ten.Substring(0, 30) + "...";
+                }
+            }
 
             if (page > 0)
             {

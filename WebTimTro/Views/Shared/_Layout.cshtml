@@ -228,7 +228,7 @@
                     <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Category") ? "active" : "")">
                       <a asp-controller="DichVu" asp-action="Index" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-cool"></i>
-                        <div data-i18n="Analytics">Admin zone</div>
+                        <div data-i18n="Analytics">Khu vực admin</div>
                       </a>
                     </li>
                 }
@@ -262,10 +262,10 @@
             </li>
            
 
-            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("UserManager") ? "active" : "")">
-              <a asp-controller="UserManager" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-user"></i>
-                <div data-i18n="Boxicons">User Manager</div>
+            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("TimKiem") ? "active" : "")">
+              <a asp-controller="TimKiem" asp-action="Index" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-search-alt-2"></i>
+                <div data-i18n="Boxicons">Tìm kiếm nâng cao</div>
               </a>
             </li>
 
