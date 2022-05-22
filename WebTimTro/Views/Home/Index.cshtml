@@ -17,12 +17,25 @@
 
 @section Search
     {
-    <div class="navbar-nav align-items-center">
-        <div class="nav-item d-flex align-items-center">
-            <i class="bx bx-search fs-4 lh-0"></i>
-            <input onclick="ShowSearchOptions()" type="text" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search...">
+    <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+        <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+            <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                <i class="bx bx-menu bx-sm"></i>
+            </a>
         </div>
-    </div>
+
+        <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+            <div class="navbar-nav align-items-center">
+                <div class="nav-item d-flex align-items-center">
+                    <i class="bx bx-search fs-4 lh-0"></i>
+                    <input onclick="ShowSearchOptions()" type="text" class="form-control border-0 shadow-none" placeholder="Search..." aria-label="Search...">
+                </div>
+            </div>
+            <ul class="navbar-nav flex-row align-items-center ms-auto">
+            </ul>
+        </div>
+    </nav>
+
 }
     <input hidden id="loginStatus" value="@(SignInManager.IsSignedIn(User) ? 1 : 0)" />
     <div class="row mb-5 load-list" style="margin-left:10px;">
@@ -57,7 +70,7 @@
     }*@
     </div>
     <input hidden id="searchStatus" value="0" />
-    <div class="demo-inline-spacing" style="margin-left:5px;">
+    <div class="demo-inline-spacing" style="margin-left:20px;">
         <!-- Basic Pagination -->
         <nav aria-label="Page navigation">
             <ul class="pagination" id="load-pagination">

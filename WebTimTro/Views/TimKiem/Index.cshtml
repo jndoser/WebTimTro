@@ -3,6 +3,49 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section Search{
+    <div class="card mb-1" style="margin-top:10px;margin-left:20px;margin-right:20px;">
+        <h5 class="card-header">Cài đặt thông số trước khi tìm kiếm</h5>
+        <div class="card-body">
+            <div class="row">
+                <div class="mb-3 col-5">
+                    <label for="exampleFormControlInput1" class="form-label">Bán kính xung quanh vị trí muốn tìm kiếm (đơn vị mét)</label>
+                    <input type="number" class="form-control" id="banKinh" value="1000">
+                </div>
+                <div class="mb-3 col-4">
+                    <label for="exampleFormControlReadOnlyInput1" class="form-label">Xác nhận bán kính</label>
+                    <input class="form-control" type="number" id="confirmBanKinh" value="1000" readonly="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="mb-3 col-5">
+                    <label for="exampleFormControlInput1" class="form-label">Số người ở</label>
+                    <input type="number" class="form-control" id="sucChua" value="0">
+                </div>
+                <div class="mb-3 col-4">
+                    <label for="exampleFormControlReadOnlyInput1" class="form-label">Xác nhận số người ở</label>
+                    <input class="form-control" type="number" id="confirmSucChua" value="0" readonly="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="mb-3 col-5">
+                    <label for="exampleFormControlInput1" class="form-label">Giá tiền</label>
+                    <input type="number" class="form-control" id="gia" value="0">
+                </div>
+                <div class="mb-3 col-4">
+                    <label for="exampleFormControlReadOnlyInput1" class="form-label">Xác nhận giá tiền</label>
+                    <input class="form-control" type="number" id="confirmGia" value="0" readonly="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <button type="button" class="btn btn-primary" onclick="setupBeforeSearch()">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 
 <div class="card" style="margin-left: 20px; margin-right: 20px; margin-top: 30px; padding:15px;">
     <div id="map" style="width:1000px; height:480px;"></div>
@@ -15,29 +58,47 @@
     var map = new goongjs.Map({
         container: 'map',
         style: 'https://tiles.goong.io/assets/goong_map_web.json',
-        center: [105.84478, 21.02897],
-        zoom: 13
+        center: [106.79456913995811, 10.845992637990177],
+        zoom: 11
     });
 
     // Add the control to the map.
     var geocoder = new GoongGeocoder({
         accessToken: 'E5ycgkTiRNvLJ7BqyM2H4kC0LJWGqbJKK2eVWUQH',
         goongjs: goongjs,
-        marker: false
+        marker: false,
+        zoom: 14
     });
     map.addControl(
         geocoder
     );
+    // Lưu lại các marker cũ để xoá khi người dùng tạo một yêu cầu 
+    // tìm kiếm mới
+    var markers = [];
 
     geocoder.on('result', function(e) {
+        var banKinh = $('#confirmBanKinh').val();   
+        var sucChua = $('#confirmSucChua').val();
+        var gia = $('#confirmGia').val();
+
         var geo = e.result.result.geometry.location;
         console.log(e);
         console.log(geo);
 
+        // Xoá marker cũ chỉ địa điểm mà người dùng muốn tìm trọ
+        // lân cận
+        if (markers.length > 0) {
+            markers[0].remove();
+        }
+        
+        // Thêm marker mới chỉ địa điểm mà người dùng muốn tìm trọ
+        // lân cận
         var marker = new goongjs.Marker({
             draggable: true
         }).setLngLat([geo.lng, geo.lat])
             .addTo(map);
+
+        markers[0] = marker;
 
         $.ajax({
             url: '/TimKiem/GetPhongTroNearby',
@@ -48,14 +109,33 @@
                     console.log('ok');
                     console.log('du lieu phong tro: ' + result.phongTros);
                     console.log('du lieu khoang cach: ' + result.khoangCachs);
+
+                    console.log('Tim kiem phong tro voi ban kinh ' + banKinh + ', suc chua ' + sucChua + ', gia ' + gia);
+                    
+                    // Xoá các marker cũ
+                    var k = 0;
+                    if (markers.length > 0) {
+                        for (let i = 1; i < markers.length; i++) {
+                        markers[i].remove();
+                        }
+                    }
+                    
+                    k = 0;
                     $.each(result.khoangCachs, function(index, value) {
-                        if (value <= 1000) {
+                        if (value <= banKinh 
+                            && ((sucChua == 0) ? true : result.phongTros[index].sucChua >= sucChua)
+                            && ((gia == 0) ? true : result.phongTros[index].gia <= gia)) {
+                            k = k + 1;
+                            console.log('marker thu ' + k);
 
                             // create the popup
                             var popup = new goongjs.Popup({ offset: 25 }).setHTML(
-                                '<h5>' + result.phongTros[index].ten + '</h5>'
+                                '<div class="col-5" style="width:200px;height:150px;">'
+                                + '<img class="card-img-top" src="/images/'+ result.firstHinhAnhList[index] +'" alt="Card image cap">'
+                                + '</div>'
+                                + '<h5>' + result.phongTros[index].ten + '</h5>'
                                 + '<p> Sô người ở: ' + result.phongTros[index].sucChua + '</p>'
-                                + '<p> Giá: ' + result.phongTros[index].gia + '</p>'
+                                + '<p> Giá: ' + result.phongTros[index].gia + ' VND</p>'
                                 + '<p> Khoảng cách đến vị trí của bạn: ' + value + ' m</p>'
                                 + '<a href="/Home/Detail/'+ result.phongTros[index].id +'">Xem phòng trọ</a>'
                             );
@@ -66,8 +146,13 @@
                                 .setLngLat([result.phongTros[index].longitude, result.phongTros[index].latitude])
                                 .setPopup(popup)
                                 .addTo(map);
+
+                                markers[k] = marker;
                             }
+                            
                     });
+                    console.log('cac marker da tao');
+                    console.log(markers);
                 }
             },
             error: function(err) {
@@ -75,5 +160,16 @@
             }
         });
     });
+
+    function setupBeforeSearch() {
+        var banKinh = $('#banKinh').val();
+        var sucChua = $('#sucChua').val();
+        var gia = $('#gia').val();
+
+        console.log('ban kinh xung quanh vi tri se tim kiem la ' + banKinh);
+        $('#confirmBanKinh').val(banKinh);
+        $('#confirmSucChua').val(sucChua);
+        $('#confirmGia').val(gia);
+    }
 
 </script>

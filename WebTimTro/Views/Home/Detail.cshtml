@@ -35,6 +35,7 @@
             }
         }
     </div>
+    <button style="margin-top:20px;margin-left:750px;" type="button" class="btn rounded-pill btn-primary" onclick="showAllPictures()">Xem tất cả hình ảnh</button>
 </div>
 <div class="row">
     <div class="card mb-4 col-7">
@@ -71,17 +72,31 @@
                         <small class="text-light fw-semibold">Những dịch vụ mà phòng trọ này cung cấp</small>
                         <div class="demo-inline-spacing mt-3">
                             <ul class="list-group">
-                                @foreach (DichVuVM dichVu in dichVusVM)
+                                @if (dichVusVM.Count <= 5)
                                 {
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <i class="bx bx-tv me-2"></i>
-                                        @dichVu.Ten
-                                    </li>
+                                    @foreach (DichVuVM dichVu in dichVusVM)
+                                    {
+                                        <li class="list-group-item d-flex align-items-center">
+                                            <i class="bx bx-tv me-2"></i>
+                                            @dichVu.Ten
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    @for (int i = 0; i < 5; i++)
+                                    {
+                                        <li class="list-group-item d-flex align-items-center">
+                                            <i class="bx bx-tv me-2"></i>
+                                            @dichVusVM[i].Ten
+                                        </li>
+                                    }
                                 }
                             </ul>
                         </div>
                     </div>
                 </div>
+                <button style="margin-bottom:40px;" type="button" class="btn rounded-pill btn-outline-primary" onclick="showAllServices()">Xem tất cả các dịch vụ</button>
                 <div class="row mb-3">
                     <div id="numbersOfLike@(Model.Id)"
                          class="card-text col-lg-1">
@@ -148,7 +163,7 @@
                         }
                         else
                         {
-                            <div>Bạn hãy đăng nhập để bình luận bài viết</div>
+                            <div>Bạn hãy đăng nhập để bình luận vào bài viết</div>
                         }
 
                         <div id="listComment">
@@ -174,6 +189,62 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal hiển thị để thông báo cho người dùng report thành công-->
+<div class="modal fade show" id="reportModal" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalToggleLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Đã báo cáo bình luận này thành công</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal hiển thị tất cả các hình ảnh của phòng trọ-->
+<div class="modal fade show" id="hinhAnhModal" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFullTitle">Hình ảnh về phòng trọ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="hinhAnhPhongTro">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal hiển thị tất cả các dịch vụ phòng trọ cung cấp-->
+<div class="modal fade show" id="dichVuModal" tabindex="-1" aria-modal="true" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalScrollableTitle">Các dịch vụ phòng trọ cung cấp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="dichVuPhongTro">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Đóng
                 </button>
             </div>
         </div>
@@ -542,6 +613,7 @@
                     data: { id: parentCommentId },
                     success: function(res) {
                         console.log(res);
+                        $('#reportModal').modal('show');
                     },
                     error: function(err) {
                         console.log(err);
@@ -644,5 +716,62 @@
                 });
             }
         }
+    }
+
+    function showAllPictures() {
+        // Load tất cả các hình ảnh của phòng trọ
+        $.ajax({
+            url: '/Home/GetAllPictures',
+            method: 'post',
+            data: { phongTroId: @Model.Id},
+            success: function(result) {
+                if (result.status == "ok") {
+                    var str = '<div class="row">';
+                    $.each(result.data, function(index, value) {
+                        str += '<div class="col-5" style="margin-left:20px;">';
+                        str += '<img class="card-img-top" src="/images/' + value + '" alt="Card image cap">';
+                        str += '</div>';
+                    });
+                    str += '</div>';
+                    $('#hinhAnhPhongTro').html(str);
+                }
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+
+
+        $('#hinhAnhModal').modal('show');
+    }
+
+    function showAllServices() {
+        $.ajax({
+            url: '/Home/GetAllServices',
+            method: 'post',
+            data: { phongTroId: @Model.Id},
+            success: function(result) {
+                if (result.status == "ok") {
+                    var str = '<div class="demo-inline-spacing mt-3">';
+                    str += '<ul class="list-group">';
+                    $.each(result.data, function(index, value) {
+                        str += '<li class="list-group-item d-flex align-items-center">';
+                        str += '<i class="bx bx-tv me-2"></i>';
+                        str += value.ten;
+                        str += '</li>';
+                    });
+                    str += '</ul>';
+                    str += '</div>';
+
+                    $('#dichVuPhongTro').html(str);
+                }
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+
+
+        $('#dichVuModal').modal('show');
     }
 </script>

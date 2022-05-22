@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebTimTro.Interfaces;
@@ -70,8 +71,14 @@ namespace WebTimTro.Controllers
                 khoangCachs.Add(item.distance.value);
             }
 
+            // Lấy tất cả các tên file hình ảnh đầu tiên của phòng trọ
+            IEnumerable<string> firstHinhAnhs = _unitOfWork.HinhAnh
+                .GetFirstHinhAnhListOfPhongTroList();
+            List<string> firstHinhAnhList = firstHinhAnhs.Reverse().ToList();
 
-            return Json(new { status = "ok", phongTros = phongTros, khoangCachs = khoangCachs });
+            return Json(new { status = "ok", phongTros = phongTros, khoangCachs = khoangCachs,
+                firstHinhAnhList = firstHinhAnhList
+            });
         }
     }
 }

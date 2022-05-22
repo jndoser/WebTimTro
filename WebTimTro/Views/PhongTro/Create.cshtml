@@ -86,7 +86,7 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="formFileMultiple" class="form-label">Tải lên những hình ảnh về phòng trọ</label>
+                    <label for="formFileMultiple" class="form-label">Tải lên những hình ảnh về phòng trọ ( tải ít nhất một hình)</label>
                     <input class="form-control" type="file" id="phongTroImages" multiple="">
                 </div>
                 <div class="row mb-3">
@@ -94,17 +94,31 @@
                         <small class="text-light fw-semibold">Chọn dịch vụ mà phòng trọ bạn cung cấp (bạn cũng có thể mô tả dịch vụ của mình trong phần mô tả)</small>
                         <div class="demo-inline-spacing mt-3">
                             <div class="list-group">
-                                @foreach (DichVuVM item in allDichVuVM)
+                                @if(allDichVuVM.Count < 5)
                                 {
-                                    <label class="list-group-item">
-                                        <input class="form-check-input me-1" type="checkbox" value="@item.Id">
-                                        @item.Ten
-                                    </label>
+                                    @foreach (DichVuVM item in allDichVuVM)
+                                    {
+                                        <label class="list-group-item">
+                                            <input class="form-check-input me-1" type="checkbox" value="@item.Id">
+                                            @item.Ten
+                                        </label>
+                                    }
+                                } else
+                                {
+                                    @for(int i = 0; i < 5; i++)
+                                    {
+                                        <label class="list-group-item">
+                                            <input class="form-check-input me-1" type="checkbox" value="@allDichVuVM[i].Id">
+                                            @allDichVuVM[i].Ten
+                                        </label>
+                                    }
                                 }
+
                             </div>
                         </div>
                     </div>
                 </div>
+                <button style="margin-bottom:40px;" type="button" class="btn rounded-pill btn-outline-primary" onclick="showAllServices()">Xem tất cả các dịch vụ</button>
                 <div class="mb-3">
                         <label for="exampleFormControlInput1" class="form-label">Tiêu đề ghi chú</label>
                         <input id="tieuDeNote" type="email" class="form-control" placeholder="Mô tả ngắn gọn về ghi chú của bạn">
@@ -124,7 +138,41 @@
         </div>
     </div>
 </div>
-
+<!--Modal hiển thị tất cả các dịch vụ phòng trọ cung cấp-->
+<div class="modal fade show" id="dichVuModal" tabindex="-1" aria-modal="true" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalScrollableTitle">Chọn các dịch vụ mà phòng trọ cung cấp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="dichVuPhongTro">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Modal hiển thị để thông báo cho người dùng-->
+    <div class="modal fade show" id="messageModal" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalToggleLabel">Thông báo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Vui lòng điền đầy đủ thông tin để tiến hành tạo phòng trọ</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <!--TinyMCE config-->
 <script src="https://cdn.tiny.cloud/1/apriqfhqbc9aqsm8233qtq2pno04fgouj36ijdsr9nvhstqt/tinymce/5/jquery.tinymce.min.js" referrerpolicy="origin"></script>
@@ -232,11 +280,15 @@
                         url: '/PhongTro/Create',
                         type: 'post',
                         dataType: 'json',
-                        data: {dichVu: val, phongTro: phongTro, ghiChu: ghiChu,
+                        data: {dichVus: val, phongTro: phongTro, ghiChu: ghiChu,
                             uploadedFilenames: uploadedFilenames},
                         success: function(res){
                             if(res.status == "ok"){
-                                window.location.href = '/PhongTro/Index';
+                                if (res.emptyStatus == "yes") {
+                                    $('#messageModal').modal('show');
+                                } else {
+                                    window.location.href = '/PhongTro/Index';
+                                }                             
                             }
                         },
                         error: function(err){
@@ -247,5 +299,52 @@
             }
         }
         );
+    }
+
+    function showAllServices() {
+
+        // Lấy các dịch vụ chủ trọ đã check
+        // lưu vào mảng để có thể lấy ra dùng
+        // lúc modal hiển thị
+        var val = [];
+        $(':checkbox:checked').each(function(i){
+          val[i] = $(this).val();
+        });
+        console.log(val);
+
+        $.ajax({
+            url: '/PhongTro/GetAllServices',
+            method: 'get',
+            success: function(result) {
+                if (result.status == "ok") {
+                    var str = '<div class="demo-inline-spacing mt-3">';
+                    str += '<ul class="list-group">';
+                    $.each(result.data, function(index, value) {
+                        if (val.includes(value.id.toString())) {
+                            str += '<label class="list-group-item">';
+                            str += '<input class="form-check-input me-1" type="checkbox" value="' + value.id + '" checked>';
+                            str += value.ten;
+                            str += '</label>';
+                        } else {
+                            //console.log(value.id);
+                            str += '<label class="list-group-item">';
+                            str += '<input class="form-check-input me-1" type="checkbox" value="'+ value.id +'">';
+                            str += value.ten;
+                            str += '</label>';
+                        }                        
+                    });
+                    str += '</ul>';
+                    str += '</div>';
+
+                    $('#dichVuPhongTro').html(str);
+                }
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+
+
+        $('#dichVuModal').modal('show');
     }
 </script>

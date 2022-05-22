@@ -112,9 +112,29 @@ namespace WebTimTro.Controllers
         }
 
         [HttpPost]
-        public JsonResult Create(List<int> dichVu, PhongTroVM phongTro,
+        public JsonResult Create(List<int> dichVus, PhongTroVM phongTro,
             NoteVM ghiChu, List<string> uploadedFilenames)
         {
+            // Kiểm tra xem dữ liệu tạo phòng trọ có rỗng
+            // không, nếu có thì trả về phía View yêu cầu
+            // nhập đầy đủ thông tin
+            if(dichVus.Count == 0 
+                || phongTro.Ten == null || phongTro.DiaChi == null
+                || phongTro.SucChua == 0 || phongTro.MoTa == null
+                || phongTro.Gia == 0 || phongTro.Longitude == 0
+                || phongTro.Latitude == 0 || ghiChu.Ten == null 
+                || ghiChu.NoiDung == null || uploadedFilenames[0] == null)
+            {
+                return Json(new { status = "ok", emptyStatus = "yes" });
+            }
+
+
+            HashSet<int> dichVuHas = new HashSet<int>();
+            foreach(int item in dichVus)
+            {
+                dichVuHas.Add(item);
+            }
+            List<int> dichVu = dichVuHas.ToList();
 
             // Lưu lại dữ liệu phòng trọ
             // Đầu tiên lấy id hiện tại của chủ trọ đang đăng nhập 
@@ -499,6 +519,17 @@ namespace WebTimTro.Controllers
             {
                 return Json(new { status = "err" });
             }
+        }
+
+        [HttpGet]
+        public JsonResult GetAllServices()
+        {
+            // Tìm các dịch vụ của phòng trọ và truyền đến view
+            List<DichVu> dichVus = _unitOfWork.DichVu.GetAll().ToList();
+            List<DichVuVM> dichVusVM = _mapper
+                .Map<List<DichVu>, List<DichVuVM>>(dichVus);
+
+            return Json(new { status = "ok", data = dichVusVM });
         }
     }
 }

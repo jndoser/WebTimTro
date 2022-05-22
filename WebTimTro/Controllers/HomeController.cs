@@ -54,12 +54,12 @@ namespace WebTimTro.Controllers
 
             // Định dạng lại độ dài của các trường dữ liệu để 
             // qua view in ra được đồng bộ
-            foreach(var item in data)
+            foreach (var item in data)
             {
-                if(item.Ten.Length > 30)
+                if (item.Ten.Length > 30)
                 {
                     item.Ten = item.Ten.Substring(0, 30) + "...";
-                }          
+                }
             }
 
             if (!string.IsNullOrEmpty(txtSearch))
@@ -103,9 +103,9 @@ namespace WebTimTro.Controllers
             // Kiểm tra xem các bài viết đã được quan tâm hay đã được người dùng lưu chưa
             // và truyền sang phía giao diện
             List<string> savedStatusList = new List<string>();
-            foreach(var phongTro in listPostVM)
+            foreach (var phongTro in listPostVM)
             {
-                if(_unitOfWork.PhongTroLuuTru.IsSaved(
+                if (_unitOfWork.PhongTroLuuTru.IsSaved(
                     _unitOfWork.NguoiDung.GetUserId(), phongTro.Id))
                 {
                     savedStatusList.Add("Đã lưu");
@@ -130,16 +130,16 @@ namespace WebTimTro.Controllers
             }
 
             List<int> numberOfQuanTamList = new List<int>();
-            foreach(var phongTro in listPostVM)
+            foreach (var phongTro in listPostVM)
             {
                 int numOfQuanTam = _unitOfWork.PhongTroQuanTam.NumbersOfQuanTam(phongTro.Id);
                 numberOfQuanTamList.Add(numOfQuanTam);
             }
 
-            return Json(new { data = listPostVM, pageCurrent = page, numSize = numSize, 
-            firstHinhAnhs = firstHinhAnhList, someDichVu = someDichVuList, 
-            savedStatusList = savedStatusList, favStatusList = favStatusList,
-            quanTams = numberOfQuanTamList});
+            return Json(new { data = listPostVM, pageCurrent = page, numSize = numSize,
+                firstHinhAnhs = firstHinhAnhList, someDichVu = someDichVuList,
+                savedStatusList = savedStatusList, favStatusList = favStatusList,
+                quanTams = numberOfQuanTamList });
         }
 
         public IActionResult Detail(int id)
@@ -152,7 +152,7 @@ namespace WebTimTro.Controllers
                 .GetHinhAnhsByPhongTroId(id);
 
             List<string> hinhAnhFileNames = new List<string>();
-            foreach(HinhAnh hinhAnh in hinhAnhs)
+            foreach (HinhAnh hinhAnh in hinhAnhs)
             {
                 hinhAnhFileNames.Add(hinhAnh.Filename);
             }
@@ -265,18 +265,18 @@ namespace WebTimTro.Controllers
                 var recentCommentId = Convert.ToInt32(_unitOfWork.BinhLuan.GetRecentCommentId());
                 var loggedUserAvatar = _unitOfWork.NguoiDung.GetAvatarByName(User.Identity.Name);
 
-               /* // Send email to author that new user comment on post
-                string emailOfAuthor = _userManagerRepo.GetEmailByUserName(User.Identity.Name);
-                Email email = new Email();
+                /* // Send email to author that new user comment on post
+                 string emailOfAuthor = _userManagerRepo.GetEmailByUserName(User.Identity.Name);
+                 Email email = new Email();
 
-                // Because the email i use to register account is fake, so 
-                // i use my email to test the mail alert when user comment
-                // on post
-                email.SendEmail(*//*emailOfAuthor*//*"hoanglongdev533@gmail.com",
-                    _config.GetValue<string>("MailAccount:Email"),
-                    _config.GetValue<string>("MailAccount:Password"),
-                    $"{_userManagerRepo.GetNameByUserName(User.Identity.Name)} has commented on your post",
-                    $"Content of comment: {content}");*/
+                 // Because the email i use to register account is fake, so 
+                 // i use my email to test the mail alert when user comment
+                 // on post
+                 email.SendEmail(*//*emailOfAuthor*//*"hoanglongdev533@gmail.com",
+                     _config.GetValue<string>("MailAccount:Email"),
+                     _config.GetValue<string>("MailAccount:Password"),
+                     $"{_userManagerRepo.GetNameByUserName(User.Identity.Name)} has commented on your post",
+                     $"Content of comment: {content}");*/
 
 
                 return Json(new
@@ -394,10 +394,12 @@ namespace WebTimTro.Controllers
         // tương ứng
         public JsonResult SearchPhongTro(SearchPhongTroOptionsVM searchOptions, int? page)
         {
-            
             var data = _unitOfWork.PhongTro.GetAll()
-                .Where(x => x.DiaChi.Contains(searchOptions.KhuVuc) ||
-                x.Gia <= searchOptions.Gia || x.SucChua == searchOptions.SoNguoiO);
+                .Where(x =>
+                ((searchOptions.KhuVuc.Equals("Tất cả")) ? true : x.DiaChi.Contains(searchOptions.KhuVuc))
+                && ((searchOptions.Gia == 0) ? true : x.Gia <= searchOptions.Gia)
+                && ((searchOptions.SoNguoiO == 0) ? true : x.SucChua == searchOptions.SoNguoiO)
+                && ((searchOptions.TienIchLanCan == null) ? true : x.MoTa.Contains(searchOptions.TienIchLanCan)));
 
 
             // Định dạng lại độ dài của các trường dữ liệu để 
@@ -435,7 +437,8 @@ namespace WebTimTro.Controllers
             // Lấy tất cả các hình ảnh đầu tiên tương ứng với tất cả
             // các phòng trọ ở trên
             IEnumerable<string> firstHinhAnhs = _unitOfWork.HinhAnh
-                .GetFirstHinhAnhListOfPhongTroList(data).Skip(start).Take(7);
+                .GetFirstHinhAnhListOfPhongTroList(data).Skip(start).Take(7)
+                .Reverse();
             List<string> firstHinhAnhList = firstHinhAnhs.ToList();
 
             // Lấy các dịch vụ tương ứng với tất cả các phòng trọ ở trên
@@ -491,6 +494,32 @@ namespace WebTimTro.Controllers
                 favStatusList = favStatusList,
                 quanTams = numberOfQuanTamList
             });
+        }
+
+        [HttpPost]
+        public JsonResult GetAllPictures(int phongTroId)
+        {
+            List<string> hinhAnhFileName = new List<string>();
+            var hinhAnhs = _unitOfWork.PhongTroHinhAnh
+                .GetHinhAnhsByPhongTroId(phongTroId);
+
+            foreach(var hinhAnh in hinhAnhs)
+            {
+                hinhAnhFileName.Add(hinhAnh.Filename);
+            }
+            return Json(new { status = "ok", data = hinhAnhFileName });
+        }
+
+        [HttpPost]
+        public JsonResult GetAllServices(int phongTroId)
+        {
+            // Tìm các dịch vụ của phòng trọ và truyền đến view
+            List<DichVu> dichVus = _unitOfWork.
+                PhongTroDichVu.GetDichVusByPhongTroId(phongTroId);
+            List<DichVuVM> dichVusVM = _mapper
+                .Map<List<DichVu>, List<DichVuVM>>(dichVus);
+
+            return Json(new { status = "ok", data = dichVusVM });
         }
 
         public IActionResult Privacy()
