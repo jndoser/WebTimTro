@@ -125,7 +125,7 @@
     </div>
     <div class="card mb-4 col-4">
         <div class="card-body">
-            <h5 class="card-title">Giá trọ: @Model.Gia</h5>
+            <h5 class="card-title">Giá trọ: @(String.Format("{0:n0}", Model.Gia)) VND</h5>
             <div class="card-subtitle text-muted mb-3">Ngày hết hạn đặt trọ: @Model.NgayHetHan</div>
             <p class="card-text">
 
@@ -155,8 +155,8 @@
                                         <textarea style="margin-left:20px;" class="form-control" id="commentOnPost" rows="3"></textarea>
                                     </div>
                                     <div class="row" style="margin-left:20px;margin-top:5px;">
-                                        <div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnPost()">post it</div>
-                                        <div class="col-lg-5" style="cursor:pointer;" onclick="CancelComment()">cancel</div>
+                                        <div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnPost()">Post it</div>
+                                        <div class="col-lg-5" style="cursor:pointer;" onclick="CancelCommentOnPost()">cancel</div>
                                     </div>
                                 </div>
                             </form>
@@ -318,8 +318,8 @@
                         contents += '</textarea>';
                         contents += '</div>';
                         contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">post it</div>';
-                        contents += '<div class="col-lg-5">Cancel</div></div>';
+                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">Post it</div>';
+                        contents += '<div class="col-lg-5" style="cursor:pointer;" onclick="CancelComment(' + element.id + ')">Cancel</div></div>';
                         contents += '</div>';
                         contents += '</form>';
 
@@ -386,8 +386,8 @@
                         contents += '</textarea>';
                         contents += '</div>';
                         contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">post it</div>';
-                        contents += '<div class="col-lg-5">Cancel</div></div>';
+                        contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + element.id + ')">Post it</div>';
+                        contents += '<div class="col-lg-5" style="cursor:pointer;" onclick="CancelComment(' + element.id + ')">Cancel</div></div>';
                         contents += '</div>';
                         contents += '</form>';
 
@@ -485,8 +485,8 @@
                             contents += '</textarea>';
                             contents += '</div>';
                             contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                            contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
-                            contents += '<div class="col-lg-5">Cancel</div></div>';
+                            contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">Post it</div>';
+                            contents += '<div class="col-lg-5" style="cursor:pointer;" onclick="CancelComment(' + element.id + ')">Cancel</div></div>';
                             contents += '</div>';
                             contents += '</form>';
 
@@ -578,8 +578,8 @@
                             contents += '</textarea>';
                             contents += '</div>';
                             contents += '<div class="row" style="margin-left:20px;margin-top:5px;">';
-                            contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">post it</div>';
-                            contents += '<div class="col-lg-5">Cancel</div></div>';
+                            contents += '<div class="col-lg-3" style="cursor:pointer;" onclick="PostCommentOnComment(' + newComment.id + ')">Post it</div>';
+                            contents += '<div class="col-lg-5" style="cursor:pointer;" onclick="CancelComment(' + element.id + ')">Cancel</div></div>';
                             contents += '</div>';
                             contents += '</form>';
 
@@ -773,5 +773,13 @@
 
 
         $('#dichVuModal').modal('show');
+    }
+
+    function CancelCommentOnPost(){
+        $('#commentOnPost').val('');
+    }
+
+    function CancelComment(id){
+        $('#commentOnComment' + id).val('');
     }
 </script>

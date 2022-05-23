@@ -154,7 +154,7 @@
                         str += "<td>"+(value.ten)+"</td>";
                         str += "<td>"+value.diaChi + "</td>";
                         str += "<td>" + value.sucChua + "</td>";
-                        str += "<td>" + value.gia + "</td>";
+                        str += "<td>" + formatCurrency(value.gia) + "</td>";
                         str += "<td>"+ NgayDang_str + "</td>";
                         str += "<td>"+ ngayHetHan_str + "</td>";
                         str += "<td>";
@@ -271,4 +271,10 @@
              }
          });
      }
+
+     function formatCurrency(numb) {
+            var str = numb.toString().split(".");
+            str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return str.join(".");
+        }
 </script>

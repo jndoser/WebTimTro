@@ -135,7 +135,7 @@
                                 + '</div>'
                                 + '<h5>' + result.phongTros[index].ten + '</h5>'
                                 + '<p> Sô người ở: ' + result.phongTros[index].sucChua + '</p>'
-                                + '<p> Giá: ' + result.phongTros[index].gia + ' VND</p>'
+                                + '<p> Giá: ' + formatCurrency(result.phongTros[index].gia) + ' VND</p>'
                                 + '<p> Khoảng cách đến vị trí của bạn: ' + value + ' m</p>'
                                 + '<a href="/Home/Detail/'+ result.phongTros[index].id +'">Xem phòng trọ</a>'
                             );
@@ -172,4 +172,9 @@
         $('#confirmGia').val(gia);
     }
 
+    function formatCurrency(numb) {
+            var str = numb.toString().split(".");
+            str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return str.join(".");
+        }
 </script>

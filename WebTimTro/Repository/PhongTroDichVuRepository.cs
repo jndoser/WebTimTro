@@ -29,5 +29,14 @@ namespace WebTimTro.Repository
 
             return result;
         }
+
+        // Lấy ra list các id dịch vụ có trong phòng trọ với id của phòng trọ
+        public List<int> GetDichVuIdsByPhongTroId(int phongTroId)
+        {
+            var dichVusId = _context.PhongTroDichVus
+                .Where(x => x.PhongTroId == phongTroId)
+                .Select(x => x.DichVuId).ToList();
+            return dichVusId;
+        }
     }
 }

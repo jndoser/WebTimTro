@@ -84,8 +84,7 @@ namespace WebTimTro.Repository
         public List<string> GetFirstHinhAnhListOfPhongTroList(IEnumerable<PhongTro> phongTros)
         {
             List<string> result = new List<string>();
-            var phongTroIds = phongTros.OrderBy(x => x.Id)
-                .Select(x => x.Id);
+            var phongTroIds = phongTros.Select(x => x.Id);
             foreach (var phongTroId in phongTroIds)
             {
                 string firstHinhAnhUrl = GetListFileNameByPhongTroId(phongTroId)[0];
