@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,6 +11,7 @@ using System.Threading.Tasks;
 using WebTimTro.Data;
 using WebTimTro.Interfaces;
 using WebTimTro.Models;
+using WebTimTro.Services.MoMo;
 
 namespace WebTimTro.Controllers
 {
@@ -18,6 +21,9 @@ namespace WebTimTro.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private static List<int> savedDichVus = new List<int>();
+
+        // MoMo stuff
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public HomeController(ILogger<HomeController> logger,
             IUnitOfWork unitOfWork, IMapper mapper)
@@ -819,6 +825,127 @@ namespace WebTimTro.Controllers
                 .Map<List<DichVu>, List<DichVuVM>>(dichVus);
 
             return Json(new { status = "ok", data = dichVusVM });
+        }
+
+        [HttpPost]
+        public JsonResult CreatePhongTroBooking(int phongTroId)
+        {
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            _unitOfWork.PhongTroBooking.Create(new PhongTroBooking
+            {
+                NguoiDungId = nguoiDungId,
+                PhongTroId = phongTroId,
+                NgayDatTro = DateTime.Now
+            });
+            if (_unitOfWork.Save())
+            {
+                HttpContext.Session.SetInt32("PhongTroId", phongTroId);
+                return Json(new { status = "ok" });
+            }
+
+            return Json(new { status = "err" });
+        }
+
+        [HttpGet]
+        public IActionResult ThanhToanMoMo()
+        {
+            // get info of phong tro
+            int id = HttpContext.Session.GetInt32("PhongTroId").Value;
+            PhongTro phongTro = _unitOfWork.PhongTro.GetById(id);
+
+            // Request params need to request to MoMo system
+            string endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+            string partnerCode = "MOMO5RGX20191128";
+            string accessKey = "M8brj9K6E22vXoDB";
+            string serectkey = "nqQiVSgDMy809JoPF6OzP5OdBUB550Y4";
+            string orderInfo = "Cọc trước 30% tiền trọ: " + phongTro.Ten;
+            string redirectUrl = "https://localhost:44338/Home/PaymentResult";
+            string ipnUrl = "https://localhost:44338/Home/NotifyUrl";
+            string requestType = "captureWallet";
+
+
+            double giaCoc = Math.Round(phongTro.Gia * 0.3, 0);
+            string amount = giaCoc.ToString();
+            string orderId = Guid.NewGuid().ToString();
+            string requestId = Guid.NewGuid().ToString();
+            string extraData = "";
+
+            //Before sign HMAC SHA256 signature
+            string rawHash = "accessKey=" + accessKey +
+                "&amount=" + amount +
+                "&extraData=" + extraData +
+                "&ipnUrl=" + ipnUrl +
+                "&orderId=" + orderId +
+                "&orderInfo=" + orderInfo +
+                "&partnerCode=" + partnerCode +
+                "&redirectUrl=" + redirectUrl +
+                "&requestId=" + requestId +
+                "&requestType=" + requestType
+                ;
+
+            log.Debug("rawHash = " + rawHash);
+
+            MoMoSecurity crypto = new MoMoSecurity();
+            //sign signature SHA256
+            string signature = crypto.signSHA256(rawHash, serectkey);
+            log.Debug("Signature = " + signature);
+
+            //build body json request
+            JObject message = new JObject
+            {
+                { "partnerCode", partnerCode },
+                { "partnerName", "Test" },
+                { "storeId", "MomoTestStore" },
+                { "requestId", requestId },
+                { "amount", amount },
+                { "orderId", orderId },
+                { "orderInfo", orderInfo },
+                { "redirectUrl", redirectUrl },
+                { "ipnUrl", ipnUrl },
+                { "lang", "en" },
+                { "extraData", extraData },
+                { "requestType", requestType },
+                { "signature", signature }
+
+            };
+            log.Debug("Json request to MoMo: " + message.ToString());
+            string responseFromMomo = PaymentRequest.sendPaymentRequest(endpoint, message.ToString());
+
+            JObject jmessage = JObject.Parse(responseFromMomo);
+            log.Debug("Return from MoMo: " + jmessage.ToString());
+
+            return Redirect(jmessage.GetValue("payUrl").ToString());
+        }
+
+        public ActionResult PaymentResult()
+        {
+            string param = Request.QueryString.ToString().Substring(0, Request.QueryString.ToString().IndexOf("signature") - 1);
+
+            //Thành công
+
+            int phongTroId = HttpContext.Session.GetInt32("PhongTroId").Value;
+
+            if (HttpContext.Request.Query["message"].Equals("Successful."))
+            {
+                ViewBag.Message = "Đặt trọ thành công! Chủ trọ sẽ sớm liên hệ với bạn";
+            }
+            else
+            {
+                ViewBag.Message = "Thanh toán thất bại!";
+                // Huỷ phiên booking người dùng vừa đặt
+                PhongTroBooking phongTroBooking = _unitOfWork.PhongTroBooking
+                    .GetPhongTroBookingByPhongTroAndNguoiDungId(phongTroId,
+                    _unitOfWork.NguoiDung.GetUserId());
+                _unitOfWork.PhongTroBooking.Delete(phongTroBooking);
+                _unitOfWork.Save();
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public JsonResult NotifyUrl()
+        {
+            return Json(new { code = 200 });
         }
 
         public IActionResult Privacy()

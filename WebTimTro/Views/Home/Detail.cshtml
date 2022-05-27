@@ -130,7 +130,7 @@
             <p class="card-text">
 
             </p>
-            <a href="javascript:void(0)" class="card-link">Đặt phòng trọ</a>
+            <a href="javascript:void(0)" id="bookingButton" class="card-link" onclick="ConfirmBooking(@Model.Id)">@((_unitOfWork.PhongTroBooking.IsDatPhong(Model.Id, _unitOfWork.NguoiDung.GetUserId()) ? "Đã đặt phòng": "Đặt phòng trọ"))</a>
             <a href="javascript:void(0)" class="card-link">Kiểm tra tình trạng trọ</a>
         </div>
         <div class="card-body">
@@ -251,6 +251,54 @@
     </div>
 </div>
 
+<!-- Hiển thị modal confirm đặt phòng trọ -->
+        <div class="modal fade" id="bookingConfirmModal" tabindex="-1" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel1">Xác nhận đặt phòng trọ</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label for="nameBasic" class="form-label">Bạn phải thanh toán 30 % giá phòng 
+                                    để tiến hành đặt trọ. Bạn có muốn đặt phòng
+                                     trọ này không? Hành động này không thể được thu hồi!
+                                </label>
+                                <input id="idPhongTroBooking" hidden/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            Huỷ
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="BookingPhongTro()">Tiến hành thanh toán</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!--Modal hiển thị để thông báo cho người dùng đã đặt trọ rồi-->
+<div class="modal fade show" id="adreadyBookingModal" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalToggleLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Bạn đã đặt phòng trọ này rồi, chủ trọ sẽ sớm liên hệ với bạn</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     //$(document).ready();
     $(function() {
@@ -781,5 +829,40 @@
 
     function CancelComment(id){
         $('#commentOnComment' + id).val('');
+    }
+
+
+    function ConfirmBooking(id){
+        var loginStatus = $('#loginStatus').val();
+        if (loginStatus == 0) {
+            $('#messageModal').modal('show');
+        } else { 
+            var bookingStatus = $('#bookingButton').html();
+            console.log('tinh trang dat phong: ' + bookingStatus);
+            if (bookingStatus == "Đã đặt phòng") {
+                $('#adreadyBookingModal').modal('show');
+            } else {
+                $('#idPhongTroBooking').val(id);
+                $('#bookingConfirmModal').modal('show');
+            }         
+        }       
+    }
+
+    function BookingPhongTro(){       
+        var id = $('#idPhongTroBooking').val();
+
+        $.ajax({
+            url: '/Home/CreatePhongTroBooking',
+            method: 'post',
+            data: {phongTroId: id},
+            success: function(result) {
+                if(result.status == "ok"){
+                    window.location.href = '/Home/ThanhToanMoMo';
+                }
+            },
+            error: function(err){
+                console.log(err);
+            }
+        });      
     }
 </script>

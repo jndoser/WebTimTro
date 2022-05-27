@@ -26,5 +26,8 @@ namespace WebTimTro.Data
 
         // 1 người dùng có thể quan tâm nhiều phòng trọ
         public ICollection<PhongTroQuanTam> PhongTroQuanTams { get; set; }
+
+        // 1 người dùng chỉ có thể đặt được nhiều phòng trọ
+        public ICollection<PhongTroBooking> PhongTroBookings { get; set; }
     }
 }
