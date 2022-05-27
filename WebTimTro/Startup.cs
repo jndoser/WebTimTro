@@ -45,6 +45,9 @@ namespace WebTimTro
             // Add auto mapper
             services.AddAutoMapper(typeof(Maps));
 
+            // Add session
+            services.AddSession();
+
             services.AddControllersWithViews();
         }
 
@@ -66,6 +69,7 @@ namespace WebTimTro
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();

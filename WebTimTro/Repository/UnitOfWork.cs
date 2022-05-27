@@ -24,6 +24,7 @@ namespace WebTimTro.Repository
         public IPhongTroHinhAnhRepository PhongTroHinhAnh { get; }
         public IPhongTroLuuTruRepository PhongTroLuuTru { get; }
         public IPhongTroQuanTamRepository PhongTroQuanTam { get; }
+        public IPhongTroBookingRepository PhongTroBooking { get; }
 
         private readonly ApplicationDbContext _context;
 
@@ -43,6 +44,7 @@ namespace WebTimTro.Repository
             PhongTroHinhAnh = new PhongTroHinhAnhRepository(_context);
             PhongTroLuuTru = new PhongTroLuuTruRepository(_context);
             PhongTroQuanTam = new PhongTroQuanTamRepository(_context);
+            PhongTroBooking = new PhongTroBookingRepository(_context);
         }
 
         public void Dispose()
