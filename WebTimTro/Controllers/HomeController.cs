@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WebTimTro.Data;
@@ -20,36 +22,24 @@ namespace WebTimTro.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _env;
         private static List<int> savedDichVus = new List<int>();
 
         // MoMo stuff
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public HomeController(ILogger<HomeController> logger,
-            IUnitOfWork unitOfWork, IMapper mapper)
+            IUnitOfWork unitOfWork, IMapper mapper, 
+            IWebHostEnvironment env)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _env = env;
         }
 
         public IActionResult Index()
         {
-            //// Lấy thông tin tất cả các bài viết trong phòng trọ
-            //IEnumerable<PhongTro> phongTros = _unitOfWork.PhongTro.GetAll();
-            //IEnumerable<PhongTroVM> phongTroVMs = _mapper
-            //    .Map<IEnumerable<PhongTroVM>>(phongTros);
-
-            //// Lấy tất cả các hình ảnh đầu tiên tương ứng với tất cả
-            //// các phòng trọ ở trên
-            //List<string> firstHinhAnhs = _unitOfWork.HinhAnh.GetFirstHinhAnhListOfPhongTroList();
-            //ViewBag.FirstHinhAnhs = firstHinhAnhs;
-
-            //// Lấy các dịch vụ tương ứng với tất cả các phòng trọ ở trên
-            //List<string> someDichVu = _unitOfWork.DichVu.GetSomeDichVuOfPhongTroList();
-            //ViewBag.SomeDichVu = someDichVu;
-
-            //return View(phongTroVMs);
             return View();
         }
 
@@ -946,6 +936,105 @@ namespace WebTimTro.Controllers
         public JsonResult NotifyUrl()
         {
             return Json(new { code = 200 });
+        }
+
+        public IActionResult EditUserProfile(string id)
+        {
+            var user = _unitOfWork.NguoiDung.GetUserById(id);
+            var userModel = _mapper.Map<NguoiDung, NguoiDungVM>(user);
+
+            return View(userModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditUserProfile(NguoiDungVM newUser)
+        {
+            var oldUser = _unitOfWork.NguoiDung.GetUserById(newUser.Id);
+            var userModel = _mapper.Map<NguoiDungVM, NguoiDung>(newUser);
+            var savedUser = oldUser;
+            if (newUser.UploadFile == null)
+            {
+                savedUser.FirstName = userModel.FirstName;
+                savedUser.MiddleName = userModel.MiddleName;
+                savedUser.LastName = userModel.LastName;
+                savedUser.Mobile = userModel.Mobile;
+                savedUser.Profile = userModel.Profile;
+                savedUser.Intro = userModel.Intro;
+
+                _unitOfWork.NguoiDung.Update(savedUser);
+                if (_unitOfWork.Save())
+                {
+
+                    return RedirectToAction("Index");
+
+                }
+            }
+            else
+            {
+                var saveResult = await UploadFileOnServer(newUser.UploadFile);
+                if (saveResult)
+                {
+
+                    savedUser.FirstName = userModel.FirstName;
+                    savedUser.MiddleName = userModel.MiddleName;
+                    savedUser.LastName = userModel.LastName;
+                    savedUser.Mobile = userModel.Mobile;
+                    savedUser.Profile = userModel.Profile;
+                    savedUser.Intro = userModel.Intro;
+                    savedUser.Avatar = newUser.UploadFile.FileName;
+
+                    _unitOfWork.NguoiDung.Update(savedUser);
+                    if (_unitOfWork.Save())
+                    {
+
+                        return RedirectToAction("Index");
+
+                    }
+                }
+            }
+
+
+            return BadRequest();
+        }
+
+        public IActionResult DeleteUserProfile(string id)
+        {
+            var user = _unitOfWork.NguoiDung.GetUserById(id);
+            _unitOfWork.NguoiDung.Delete(user);
+            if (_unitOfWork.Save())
+            {
+                return RedirectToAction("Index");
+            }
+            return BadRequest();
+        }
+
+        // Lưu file avatar vào thư mục images trong wwwroot
+        public async Task<bool> UploadFileOnServer(IFormFile file)
+        {
+            string path = "";
+            bool isCopied = false;
+            try
+            {
+                if (file.Length > 0)
+                {
+                    string fileName = file.FileName;
+                    path = Path.Combine(_env.WebRootPath, "images");
+                    using (var filestream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
+                    {
+                        await file.CopyToAsync(filestream);
+                    }
+                    isCopied = true;
+                }
+                else
+                {
+                    isCopied = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return isCopied;
         }
 
         public IActionResult Privacy()

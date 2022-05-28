@@ -130,8 +130,10 @@
             <p class="card-text">
 
             </p>
+            <input hidden id="soNguoiDatTro" type="number" value="@(_unitOfWork.PhongTroBooking.GetSoLuongNguoiDatCocByPhongTroId(Model.Id))"/>
+            <input hidden id="adreadyBookingStatus" type="number" value="@((_unitOfWork.PhongTroBooking.IsAdreadyBooking(_unitOfWork.NguoiDung.GetUserId())) ? 1 : 0)" />
             <a href="javascript:void(0)" id="bookingButton" class="card-link" onclick="ConfirmBooking(@Model.Id)">@((_unitOfWork.PhongTroBooking.IsDatPhong(Model.Id, _unitOfWork.NguoiDung.GetUserId()) ? "Đã đặt phòng": "Đặt phòng trọ"))</a>
-            <a href="javascript:void(0)" class="card-link">Kiểm tra tình trạng trọ</a>
+            <a href="javascript:void(0)" class="card-link" onclick="CheckBookingStatus()">Kiểm tra tình trạng trọ</a>
         </div>
         <div class="card-body">
             <div id='map' style='width: 100%; height: 500px;'></div>
@@ -150,8 +152,7 @@
                                 <div class="bg-light p-2">
                                     <div class="d-flex flex-row align-items-start">
                                         <img class="rounded-circle" src="~/images/@(_unitOfWork.NguoiDung.GetUserById(_unitOfWork.NguoiDung.GetUserId()).Avatar)" width="40" height="40">
-                                        @*<textarea id="commentOnPost" class="form-control ml-1 shadow-none textarea">
-                                    </textarea>*@
+                                        
                                         <textarea style="margin-left:20px;" class="form-control" id="commentOnPost" rows="3"></textarea>
                                     </div>
                                     <div class="row" style="margin-left:20px;margin-top:5px;">
@@ -186,6 +187,60 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">Bạn hãy đăng nhập để thực hiện tính năng này</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal hiển thị để thông báo cho người dùng-->
+<div class="modal fade show" id="adreadyBookingModal" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalToggleLabel">Bạn không thể tiếp tục đặt cọc</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Hệ thống phát hiện bạn đã đặt trọ trước đó, chủ trọ sẽ sớm liên hệ bạn</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal hiển thị để thông báo cho người dùng là còn chỗ trống-->
+<div class="modal fade show" id="bookingStatusModalTrue" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalToggleLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Hiện tại phòng trọ vẫn còn chỗ trống, bạn có thể tiến hành đặt phòng!</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal hiển thị để thông báo cho người dùng là hết chỗ trống-->
+<div class="modal fade show" id="bookingStatusModalFalse" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalToggleLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Hiện tại phòng trọ đã hết chỗ, bạn có thể quay lại sau nhé!</div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     OK
@@ -842,8 +897,18 @@
             if (bookingStatus == "Đã đặt phòng") {
                 $('#adreadyBookingModal').modal('show');
             } else {
-                $('#idPhongTroBooking').val(id);
-                $('#bookingConfirmModal').modal('show');
+                var adreadyBookingStatus = $('#adreadyBookingStatus').val();
+                if(adreadyBookingStatus == 1){
+                    $('#adreadyBookingModal').modal('show');
+                } else {
+                    var soNguoiDatTro = $('#soNguoiDatTro').val();
+                    if (soNguoiDatTro == @Model.SucChua) {
+                        $('#bookingStatusModalFalse').modal('show');
+                    } else {
+                        $('#idPhongTroBooking').val(id);
+                        $('#bookingConfirmModal').modal('show');
+                    }  
+                }                         
             }         
         }       
     }
@@ -864,5 +929,14 @@
                 console.log(err);
             }
         });      
+    }
+
+    function CheckBookingStatus(){
+        var soNguoiDatTro = $('#soNguoiDatTro').val();
+        if (soNguoiDatTro < @Model.SucChua) {
+            $('#bookingStatusModalTrue').modal('show');
+        } else {
+            $('#bookingStatusModalFalse').modal('show');
+        }
     }
 </script>
