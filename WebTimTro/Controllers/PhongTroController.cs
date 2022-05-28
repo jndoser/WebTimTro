@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -23,21 +24,29 @@ namespace WebTimTro.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _env;
         private readonly IMapper _mapper;
+        private readonly SignInManager<NguoiDung> _signInManager;
+        private readonly UserManager<NguoiDung> _userManager;
 
         public PhongTroController(IUnitOfWork unitOfWork,
             IWebHostEnvironment env,
-            IMapper mapper)
+            IMapper mapper,
+            SignInManager<NguoiDung> signInManager,
+            UserManager<NguoiDung> userManager)
         {
             _unitOfWork = unitOfWork;
             _env = env;
             _mapper = mapper;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
+        [Authorize(Roles = "Administrator, Chutro")]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Authorize(Roles = "Administrator, Chutro")]
         public IActionResult Create()
         {
             // Tìm tất cả các dịch vụ có trong dữ liệu
@@ -51,6 +60,7 @@ namespace WebTimTro.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Administrator, Chutro")]
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -88,6 +98,7 @@ namespace WebTimTro.Controllers
             return View(phongTroVM);
         }
 
+        [Authorize(Roles = "Administrator, Chutro")]
         // Xoá bài viết về phòng trọ (cách thông thường)
         [HttpGet]
         public IActionResult Delete(int id)
@@ -192,7 +203,7 @@ namespace WebTimTro.Controllers
 
             return Json(new {status = "ok"});
         }
-
+        
         // Upload nhiều file ảnh của phòng trọ
         [HttpPost]
         public async Task<JsonResult> UploadFile(IList<IFormFile> files)
@@ -249,7 +260,16 @@ namespace WebTimTro.Controllers
         [HttpGet]
         public JsonResult GetAllPost(string txtSearch, int? page)
         {
-            var data = _unitOfWork.PhongTro.GetAll();
+            IEnumerable<PhongTro> data = null;
+            if (User.IsInRole("Chutro"))
+            {
+                data = _unitOfWork.PhongTro.GetAll().Where(x => x
+                .ChuTroId.Equals(_unitOfWork.NguoiDung.GetUserId()));
+            } else
+            {
+                data = _unitOfWork.PhongTro.GetAll();
+            }
+            
             if (!string.IsNullOrEmpty(txtSearch))
             {
                 long sucChua = 0;
@@ -444,15 +464,8 @@ namespace WebTimTro.Controllers
         }
 
         // Hiển thị các phòng trọ đã lưu
-        // [Authorize(Roles = "nguoidung")]
         public IActionResult Saved()
         {
-            //string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
-            //List<PhongTro> phongTros = _unitOfWork.PhongTro
-            //    .GetPhongTrosByNguoiDungId(nguoiDungId);
-            //List<PhongTroVM> phongTroVM = _mapper.Map<List<PhongTroVM>>(phongTros);
-
-            //return View(phongTroVM);
             return View();
         }
 

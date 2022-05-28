@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using WebTimTro.Interfaces;
 
 namespace WebTimTro.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class ThongKeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

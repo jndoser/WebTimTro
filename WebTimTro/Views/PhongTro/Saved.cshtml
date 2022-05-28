@@ -34,30 +34,7 @@
                     </tr>
                 </thead>
                 <tbody class="load-list">
-                    @*@foreach (var item in Model)
-                {
-                <tr id="row@(item.Id)">
-                <td>@Html.DisplayFor(modelItem => item.Ten)</td>
-                <td>@Html.DisplayFor(modelItem => item.DiaChi)</td>
-                <td>@Html.DisplayFor(modelItem => item.SucChua)</td>
-                <td>@Html.DisplayFor(modelItem => item.Gia)</td>
-                <td>@Html.DisplayFor(modelItem => item.NgayDang)</td>
-                <td>@Html.DisplayFor(modelItem => item.NgayHetHan)</td>
-                <td>
-                <div class="dropdown">
-                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                <i class="bx bx-dots-vertical-rounded"></i>
-                </button>
-                <div class="dropdown-menu">
-                <a class="dropdown-item" href="/Home/Detail/@item.Id">
-                <i class="bx bx-edit-alt me-1"></i>View
-                </a>
-                <a class="dropdown-item" onclick="deleteConfirm(@(item.Id))"><i class="bx bx-trash me-1"></i>Delete</a>
-                </div>
-                </div>
-                </td>
-                </tr>
-                }*@
+                    
                 </tbody>
                 <tfoot class="table-border-bottom-0">
                     <tr>
@@ -175,8 +152,8 @@
                             str += '<i class="bx bx-dots-vertical-rounded"></i>';
                             str += '</button>';
                             str += '<div class="dropdown-menu">';
-                            str += '<a class="dropdown-item" href="/PhongTro/Edit/' + value.id + '"><i class="bx bx-edit-alt me-1"></i> Edit</a>';
-                            //str += '<a class="dropdown-item" href="/PhongTro/Delete/'+ value.id +'"><i class="bx bx-trash me-1"></i> Delete</a>';
+                            str += '<a class="dropdown-item" href="/Home/Detail/' + value.id + '"><i class="bx bx-show-alt me-1"></i> View</a>';
+                            
                             str += '<a class="dropdown-item" onclick="deleteConfirm(' + value.id + ')"><i class="bx bx-trash me-1"></i> Delete</a>';
                             str += '</div>';
                             str += '</div>';

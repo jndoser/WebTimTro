@@ -1,0 +1,179 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card" style="margin-left: 50px; margin-right: 50px; margin-top: 30px;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Danh sách đặt cọc của các phòng trọ</h5>
+    </div>
+    <div class="input-group" style="width:600px; margin:20px;">
+        <input type="text" class="form-control txtSearch" placeholder="Nhập vào thông tin phòng trọ bạn muốn tìm kiếm" aria-label="Ten chu tro" aria-describedby="search">
+        <button class="btn btn-outline-primary" type="button" id="search">Tìm kiếm</button>
+    </div>
+
+    <div class="table-responsive text-nowrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tên</th>
+                    <th>Địa Chỉ</th>
+                    <th>Số người đặt cọc</th>
+                    <th>Giá</th>
+                    <th>Ngày Đăng</th>
+                    <th>Ngày Hết Hạn</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody class="load-list">
+            </tbody>
+            <tfoot class="table-border-bottom-0">
+                <tr>
+                    <th>Tên</th>
+                    <th>Địa Chỉ</th>
+                    <th>Số người đặt cọc</th>
+                    <th>Giá</th>
+                    <th>Ngày Đăng</th>
+                    <th>Ngày Hết Hạn</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="demo-inline-spacing" style="margin-left:5px;">
+            <!-- Basic Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination" id="load-pagination">
+                </ul>
+            </nav>
+            <!--/ Basic Pagination -->
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    $(function() {
+        function load(txtSearch, page) {
+            $.ajax({
+                url: '/PhongTroDatCoc/GetAll',
+                method: 'get',
+                data: { txtSearch: txtSearch, page: page },
+                success: function(result) {
+                    if (result.status == "ok") {
+                        var str = '';
+                        $.each(result.phongTros, function(index, value) {
+                            // Formatted Ngay dang bai
+                            var ngayDang = new Date(value.ngayDang);
+                            var NgayDang_str = ((ngayDang.getMonth() > 8) ? (ngayDang.getMonth() + 1) :
+                                ('0' + (ngayDang.getMonth() + 1))) + '/' + ((ngayDang.getDate() > 9)
+                                    ? ngayDang.getDate() : ('0' + ngayDang.getDate()))
+                                + '/' + ngayDang.getFullYear();
+
+                            // Formatted Ngay het han cho dat tro
+                            var ngayHetHan = new Date(value.ngayHetHan);
+                            var ngayHetHan_str = ((ngayHetHan.getMonth() > 8) ? (ngayHetHan.getMonth() + 1) :
+                                ('0' + (ngayHetHan.getMonth() + 1))) + '/' + ((ngayHetHan.getDate() > 9)
+                                    ? ngayHetHan.getDate() : ('0' + ngayHetHan.getDate()))
+                                + '/' + ngayHetHan.getFullYear();
+
+                            // Create list post
+                            str += '<tr id="row' + value.id + '">';
+                            str += "<td>" + (value.ten) + "</td>";
+                            str += "<td>" + value.diaChi + "</td>";
+                            str += "<td>" + result.datCocs[index] + '/' + value.sucChua + "</td>";
+                            str += "<td>" + formatCurrency(value.gia) + "</td>";
+                            str += "<td>" + NgayDang_str + "</td>";
+                            str += "<td>" + ngayHetHan_str + "</td>";
+                            str += "<td>";
+                            str += '<div class="dropdown">';
+                            str += '<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">';
+                            str += '<i class="bx bx-dots-vertical-rounded"></i>';
+                            str += '</button>';
+                            str += '<div class="dropdown-menu">';
+                            str += '<a class="dropdown-item" href="/PhongTroDatCoc/ViewNguoiDat/'+ value.id +'"><i class="bx bx-show-alt me-1"></i> Xem ai đã đặt cọc</a>';
+                            str += '</div>';
+                            str += '</div>';
+                            str += '</td>';
+                            str += "</tr>";
+
+                            // Create pagination
+                            var pagination_string = "";
+                            var pageCurrent = result.pageCurrent;
+                            var numSize = result.numSize;
+
+                            // Create button previous
+                            if (pageCurrent > 1) {
+                                var pagePrevious = pageCurrent - 1;
+                                pagination_string += '<li class="page-item">';
+                                pagination_string += '<a class="page-link" href="" data-page="' + pagePrevious + '">Previous</a>';
+                                pagination_string += '</li>';
+                            }
+
+                            for (var i = 1; i <= numSize; i++) {
+                                if (i == pageCurrent) {
+                                    pagination_string += '<li class="page-item active">';
+                                    pagination_string += '<a class="page-link" href="" data-page="' + i + '">' + pageCurrent + '</a>';
+                                    pagination_string += '</li>';
+                                } else {
+                                    pagination_string += '<li class="page-item">';
+                                    pagination_string += '<a class="page-link" href="" data-page="' + i + '">' + i + '</a>';
+                                    pagination_string += '</li>';
+                                }
+                            }
+
+                            // Create button next
+                            if (pageCurrent > 0 && pageCurrent < numSize) {
+                                var pageNext = pageCurrent + 1;
+                                pagination_string += '<li class="page-item">';
+                                pagination_string += '<a class="page-link" href="" data-page="' + pageNext + '">Next</a>';
+                                pagination_string += '</li>';
+                            }
+
+                            // Load pagination
+                            $("#load-pagination").html(pagination_string);
+                        });
+                        // Load str to class="load-list"
+                        $(".load-list").html(str);
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        }
+
+        // Click event pagination
+        $("body").on("click", ".pagination li a", function(event) {
+            event.preventDefault();
+            var page = $(this).attr('data-page');
+
+            // Load event pagination
+            var txtSearch = $('.txtSearch').val();
+            if (txtSearch != "") {
+                load(txtSearch, page);
+            } else {
+                load(null, page);
+            }
+        });
+
+        // Click event search
+        $('#search').click(function() {
+            var txtSearch = $('.txtSearch').val();
+            if (txtSearch != '') {
+                load(txtSearch, 1);
+            } else {
+                load(null, 1);
+            }
+        });
+
+        // Load init
+        load(null, 1);
+    });
+
+    function formatCurrency(numb) {
+        var str = numb.toString().split(".");
+        str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return str.join(".");
+    }
+</script>

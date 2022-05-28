@@ -29,12 +29,9 @@ namespace WebTimTro.Controllers
             _mapper = mapper;
             _env = env;
         }
+
         public IActionResult Index()
         {
-            //var users = _unitOfWork.NguoiDung.GetAllNguoiDungWithNguoiDungRole();
-            //var usersModel = _mapper.Map<IEnumerable<NguoiDung>, IEnumerable<NguoiDungVM>>(users);
-
-            //return View(usersModel);
             return View();
         }
 
@@ -100,7 +97,9 @@ namespace WebTimTro.Controllers
                 _unitOfWork.NguoiDung.Update(savedUser);
                 if (_unitOfWork.Save())
                 {
+                    
                     return RedirectToAction("Index");
+                    
                 }
             }
             else
@@ -120,7 +119,9 @@ namespace WebTimTro.Controllers
                     _unitOfWork.NguoiDung.Update(savedUser);
                     if (_unitOfWork.Save())
                     {
+                        
                         return RedirectToAction("Index");
+                                            
                     }
                 }
             }
