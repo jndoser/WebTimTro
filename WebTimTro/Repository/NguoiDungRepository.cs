@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -107,6 +108,41 @@ namespace WebTimTro.Repository
             }
 
             return result;
+        }
+
+        // Get tất cả người dùng đã đăng ký muốn trở thành chủ trọ
+        public ICollection<NguoiDung> GetAllNguoiDungDangKyTroThanhChuTro()
+        {
+            return _context.NguoiDungs
+                .Where(x => x.ChuTroRegisterStatus == true).ToList();
+        }
+
+        public bool SetChuTroRoleToUser(string nguoiDungId)
+        {
+            // Xoá Role hiện tại của người dùng là role Nguoidung
+            var userRole = _context.UserRoles.FirstOrDefault(x => x.UserId.Equals(nguoiDungId));
+            _context.UserRoles.Remove(userRole);
+            _context.SaveChanges();
+
+            // Lấy ra roleId của Role Chutro
+            var chuTroRoleId = _context.Roles.FirstOrDefault(x => x.Name.Equals("Chutro")).Id;
+
+            // Thêm một UserRole mới với Role là Chutro
+            var newRole = new IdentityUserRole<string>()
+            {
+                RoleId = chuTroRoleId,
+                UserId = nguoiDungId
+            };
+
+            _context.UserRoles.Add(newRole);
+
+            if (_context.SaveChanges() > 0)
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
         }
     }
 }

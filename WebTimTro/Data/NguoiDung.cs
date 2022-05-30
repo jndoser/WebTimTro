@@ -14,6 +14,7 @@ namespace WebTimTro.Data
         public string Intro { get; set; }
         public string Profile { get; set; }
         public string Avatar { get; set; }
+        public bool ChuTroRegisterStatus { get; set; } = false;
         // 1 người dùng có thể có nhiều
         // bình luận
         public ICollection<BinhLuan> BinhLuans { get; set; }

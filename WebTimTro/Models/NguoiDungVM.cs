@@ -15,6 +15,7 @@ namespace WebTimTro.Models
         public string Intro { get; set; }
         public string Profile { get; set; }
         public string Avatar { get; set; }
+        public bool ChuTroRegisterStatus { get; set; }
         [NotMapped]
         public IFormFile UploadFile { get; set; }
     }

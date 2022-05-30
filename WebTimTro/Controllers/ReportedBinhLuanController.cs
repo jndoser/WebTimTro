@@ -23,17 +23,6 @@ namespace WebTimTro.Controllers
         }
         public IActionResult Index()
         {
-            //var reportedComments = _unitOfWork.BinhLuan.GetReportedComments();
-            //var reportedCommentsModel = _mapper
-            //    .Map<IEnumerable<ReportedBinhLuanVM>>(reportedComments);
-
-            //foreach (var comment in reportedCommentsModel)
-            //{
-            //    comment.TenCuaNguoiDang = _unitOfWork.BinhLuan
-            //        .GetAuthorByCommentId(comment.Id);
-            //}
-
-            //return View(reportedCommentsModel);
             return View();
         }
 

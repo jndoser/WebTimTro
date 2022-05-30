@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using WebTimTro.Data;
 using WebTimTro.Interfaces;
@@ -54,6 +55,21 @@ namespace WebTimTro.Repository
         {
             return _context.PhongTroBookings
                 .Any(x => x.NguoiDungId.Equals(nguoiDungId));
+        }
+
+        public bool IsQuaHanDatPhong(int phongTroId)
+        {
+            DateTime hanDat = _context
+                .PhongTros.FirstOrDefault(x => x.Id == phongTroId)
+                .NgayHetHan;
+
+            if(DateTime.Compare(DateTime.Now, hanDat) > 0)
+            {
+                return true;
+            }else
+            {
+                return false;
+            }
         }
     }
 }
