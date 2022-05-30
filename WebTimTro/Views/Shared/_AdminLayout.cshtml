@@ -123,7 +123,7 @@
             </li>
            
 
-            <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("ChuTro") ? "active" : "")">
+            <li class="menu-item @(Context.Request.GetDisplayUrl().Split("/")[3].Equals("ChuTro") ? "active" : "")">
               <a asp-controller="ChuTro" asp-action="Index" class="menu-link">
                 <i class='menu-icon tf-icons bx bxs-user-detail'></i>
                 <div data-i18n="Boxicons">Chủ trọ</div>
@@ -141,6 +141,13 @@
               <a asp-controller="ReportedBinhLuan" asp-action="Index" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-no-entry"></i>
                 <div data-i18n="Boxicons">Duyệt bình luận báo cáo</div>
+              </a>
+            </li>
+
+            <li class="menu-item @(Context.Request.GetDisplayUrl().Split("/")[3].Equals("ChuTroRegister") ? "active" : "")">
+              <a asp-controller="ChuTroRegister" asp-action="Index" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user-check"></i>
+                <div data-i18n="Boxicons">Duyệt đăng ký chủ trọ</div>
               </a>
             </li>
 

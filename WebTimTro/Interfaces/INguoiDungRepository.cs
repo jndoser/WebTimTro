@@ -12,5 +12,8 @@ namespace WebTimTro.Interfaces
         public bool IsAuthenticated();
         public ICollection<NguoiDung> GetAllNguoiDungWithNguoiDungRole();
         public ICollection<NguoiDung> GetAllNguoiDungWithChuTroRole();
+        public bool SetChuTroRoleToUser(string nguoiDungId);
+        // Get tất cả người dùng đã đăng ký muốn trở thành chủ trọ
+        public ICollection<NguoiDung> GetAllNguoiDungDangKyTroThanhChuTro();
     }
 }

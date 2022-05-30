@@ -11,5 +11,6 @@ namespace WebTimTro.Interfaces
         public int GetSoLuongNguoiDatCocByPhongTroId(int phongTroId);
         public List<NguoiDung> GetNguoiDatCocByPhongTroId(int phongTroId);
         public bool IsAdreadyBooking(string nguoiDungId);
+        public bool IsQuaHanDatPhong(int phongTroId);
     }
 }

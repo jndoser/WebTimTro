@@ -83,7 +83,7 @@
         </form>
         <!-- /Account -->
     </div>
-    <div class="card">
+    <div class="card mb-4">
         <h5 class="card-header">Delete Account</h5>
         <div class="card-body">
             <div class="mb-3 col-12 mb-0">
@@ -101,4 +101,80 @@
             </form>
         </div>
     </div>
+    <div class="card">
+        <h5 class="card-header">Đăng ký trở thành chủ trọ</h5>
+        <div class="card-body">
+            <div class="mb-3 col-12 mb-0">
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading fw-bold mb-1">Bạn có muốn trở thành chủ trọ không?</h6>
+                    <p class="mb-0">Trở thành chủ trọ để giới thiệu đến mọi người các phòng trọ mà bạn đang cung cấp và hơn thế nữa.</p>
+                </div>
+            </div>
+            <div>
+                <div class="form-check mb-3">
+                    
+                    <label class="form-check-label" for="accountActivation">Tôi xác nhận đăng ký trở thành chủ trọ</label>
+                </div>
+                <button onclick="RegisterBecomeChuTro()" class="btn btn-primary deactivate-account">Tiến hành đăng ký</button>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+<!--Modal hiển thị để thông báo cho người dùng đã đăng ký chủ trọ thành công-->
+<div class="modal fade show" id="chuTroRegisterModal" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalToggleLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Bạn đã đăng ký trở thành chủ trọ thành công, hãy đợi admin duyệt yêu cầu của bạn nhé</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal hiển thị để thông báo cho người dùng là họ đã có quyền chủ trọ rồi-->
+<div class="modal fade show" id="chuTroAdreadyModal" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalToggleLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Bạn hiện tại đã là chủ trọ rồi</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function RegisterBecomeChuTro() {
+    $.ajax({
+        url: '/Home/RegisterChutrorRole',
+        method: 'get',
+        success: function(result) {
+            if (result.status == "no") {
+                $('#chuTroAdreadyModal').modal('show');
+            } else {
+                if (result.status == "ok") {
+                    $('#chuTroRegisterModal').modal('show');
+                }
+            }           
+        },
+        error: function(err){
+            console.log(err);
+        }
+    });
+}
+
+</script>

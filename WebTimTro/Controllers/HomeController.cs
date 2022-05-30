@@ -1037,6 +1037,33 @@ namespace WebTimTro.Controllers
             return isCopied;
         }
 
+        [HttpGet]
+        public JsonResult RegisterChutrorRole()
+        {
+            if (User.IsInRole("Chutro") || User.IsInRole("Administrator"))
+            {
+                return Json(new { status = "no" });
+            } else
+            {
+                string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+                NguoiDung nguoiDung = _unitOfWork.NguoiDung.GetUserById(nguoiDungId);
+                NguoiDung newNguoiDung = nguoiDung;
+                newNguoiDung.ChuTroRegisterStatus = true;
+
+                _unitOfWork.NguoiDung.Update(newNguoiDung);
+
+
+                if (_unitOfWork.Save())
+                {
+                    return Json(new { status = "ok" });
+                }
+                else
+                {
+                    return Json(new { status = "err" });
+                }
+            }
+        }
+
         public IActionResult Privacy()
         {
             return View();
