@@ -396,7 +396,7 @@ namespace WebTimTro.Controllers
                 ((searchOptions.KhuVuc.Equals("Tất cả")) ? true : x.DiaChi.Contains(searchOptions.KhuVuc))
                 && ((searchOptions.Gia == 0) ? true : x.Gia <= searchOptions.Gia)
                 && ((searchOptions.SoNguoiO == 0) ? true : x.SucChua == searchOptions.SoNguoiO)
-                && ((searchOptions.TienIchLanCan == null) ? true : x.MoTa.Contains(searchOptions.TienIchLanCan)));
+                && ((searchOptions.TienIchLanCan == null) ? true : x.MoTa.ToLower().Contains(searchOptions.TienIchLanCan.ToLower())));
 
 
             // Định dạng lại độ dài của các trường dữ liệu để 

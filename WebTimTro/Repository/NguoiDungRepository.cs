@@ -35,6 +35,29 @@ namespace WebTimTro.Repository
             _context.UserRoles.Remove(userRole);
             _context.SaveChanges();
 
+            //// Xoá các bình luận của người dùng
+            //var binhLuans = _context.BinhLuans.Where(x => x.NguoiDungId.Equals(entity.Id));
+            //_context.BinhLuans.RemoveRange(binhLuans);
+            //_context.SaveChanges();
+
+            //// Xoá các phòng trọ lưu trữ của người dùng
+            //var phongTroLuuTrus = _context.PhongTroLuuTrus.Where(x => x.NguoiDungId.Equals(entity.Id));
+            //_context.PhongTroLuuTrus.RemoveRange(phongTroLuuTrus);
+            //_context.SaveChanges();
+
+            //// Xoá các phòng trọ booking của người dùng
+            //var phongTroBookings = _context.PhongTroBookings.Where(x => x.NguoiDungId.Equals(entity.Id));
+            //_context.PhongTroBookings.RemoveRange(phongTroBookings);
+            //_context.SaveChanges();
+
+            //// Xoá các phòng trọ người dùng quan tâm
+            //var phongTroQuanTams = _context.PhongTroQuanTams.Where(x => x.NguoiDungId.Equals(entity.Id));
+            //_context.PhongTroQuanTams.RemoveRange(phongTroQuanTams);
+            //_context.SaveChanges();
+
+            //// Xoá phòng trọ mà người dùng đã tạo ra
+
+
             // Xoá user 
             _context.Users.Remove(entity);
         }
