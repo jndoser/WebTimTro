@@ -55,9 +55,17 @@ namespace WebTimTro.Repository
             //_context.PhongTroQuanTams.RemoveRange(phongTroQuanTams);
             //_context.SaveChanges();
 
-            //// Xoá phòng trọ mà người dùng đã tạo ra
+            // Xoá phòng trọ mà người dùng đã tạo ra
+            var phongTros = _context.PhongTros.Where(x => x.ChuTroId.Equals(entity.Id));
+            if (phongTros.Count() > 0)
+            {
+                foreach (var phongTro in phongTros)
+                {
+                    _context.PhongTros.Remove(phongTro);
+                }
+                _context.SaveChanges();
 
-
+            }
             // Xoá user 
             _context.Users.Remove(entity);
         }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebTimTro.Data;
 
 namespace WebTimTro.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220531221332_AddNoActionOnDeleteBetweenPhongTroVaChuTro")]
+    partial class AddNoActionOnDeleteBetweenPhongTroVaChuTro
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,21 +51,21 @@ namespace WebTimTro.Data.Migrations
                         new
                         {
                             Id = "admin",
-                            ConcurrencyStamp = "80c7e015-6b61-45dc-99b2-f78ab0d6ce36",
+                            ConcurrencyStamp = "3c6e3397-5bb0-429e-8c7a-c2bd0a00a32c",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "nguoidung",
-                            ConcurrencyStamp = "fe122e61-441d-4942-b394-9266c74f88ea",
+                            ConcurrencyStamp = "da109199-0a51-4088-be68-86b489dc37a9",
                             Name = "Nguoidung",
                             NormalizedName = "NGUOIDUNG"
                         },
                         new
                         {
                             Id = "chutro",
-                            ConcurrencyStamp = "07f0e0e3-81c5-4ca3-8992-79d37d38b399",
+                            ConcurrencyStamp = "0dd61c29-e22e-4110-bb54-516cfbebc9d2",
                             Name = "Chutro",
                             NormalizedName = "CHUTRO"
                         });
@@ -629,7 +631,8 @@ namespace WebTimTro.Data.Migrations
                 {
                     b.HasOne("WebTimTro.Data.NguoiDung", "ChuTro")
                         .WithMany("PhongTros")
-                        .HasForeignKey("ChuTroId");
+                        .HasForeignKey("ChuTroId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("ChuTro");
                 });

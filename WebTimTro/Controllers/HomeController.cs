@@ -997,15 +997,17 @@ namespace WebTimTro.Controllers
             return BadRequest();
         }
 
-        public IActionResult DeleteUserProfile(string id)
+        [HttpGet]
+        public JsonResult DeleteUserProfile()
         {
+            string id = _unitOfWork.NguoiDung.GetUserId();
             var user = _unitOfWork.NguoiDung.GetUserById(id);
             _unitOfWork.NguoiDung.Delete(user);
             if (_unitOfWork.Save())
             {
-                return RedirectToAction("Index");
+                return Json(new { status = "ok" });
             }
-            return BadRequest();
+            return Json(new { status = "err" });
         }
 
         // Lưu file avatar vào thư mục images trong wwwroot
