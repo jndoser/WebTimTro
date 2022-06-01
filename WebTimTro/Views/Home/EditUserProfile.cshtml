@@ -92,12 +92,12 @@
                     <p class="mb-0">Once you delete your account, there is no going back. Please be certain.</p>
                 </div>
             </div>
-            <form asp-action="DeleteUserProfile">
+            <form>
                 <div class="form-check mb-3">
                     <input class="form-check-input" asp-for="Id" hidden>
                     <label class="form-check-label" for="accountActivation">I confirm my account deactivation</label>
                 </div>
-                <button type="submit" class="btn btn-danger deactivate-account">Deactivate Account</button>
+                <button type="button" onclick="ConfirmDeleteNguoiDung()" class="btn btn-danger deactivate-account">Deactivate Account</button>
             </form>
         </div>
     </div>
@@ -157,6 +157,38 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel1">Xác nhận xoá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="nameBasic" class="form-label">Bạn có muốn xoá tài khoản không? Hành
+                            động này không thể hoàn tác!
+                        </label>
+                        <input id="idNguoiDungDelete" hidden/>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary" onclick="DeleteNguoiDung()">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
 function RegisterBecomeChuTro() {
     $.ajax({
@@ -177,4 +209,24 @@ function RegisterBecomeChuTro() {
     });
 }
 
+function ConfirmDeleteNguoiDung(){
+    $('#deleteConfirmModal').modal('show');
+}
+
+function DeleteNguoiDung(){
+    $.ajax({
+        url: '/Home/DeleteUserProfile',
+        method: 'get',
+        success: function(result) {
+            if(result.status == "ok"){
+                $('#deleteConfirmModal').modal('hide');
+                console.log('deleted');
+                document.getElementById('logoutButton').click();
+            }
+        },
+        error: function(err){
+            console.log(err);
+        }
+    });
+}
 </script>

@@ -26,7 +26,8 @@ namespace WebTimTro.Configurations
             // người dùng
             builder.HasOne(x => x.NguoiDung)
                 .WithMany(y => y.BinhLuans)
-                .HasForeignKey(x => x.NguoiDungId);
+                .HasForeignKey(x => x.NguoiDungId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Set relationship giữa bình luận và
             // phòng trọ

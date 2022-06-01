@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebTimTro.Data;
 
 namespace WebTimTro.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220531220500_AddCascadeBetweenBinhluanVaNguoiDung")]
+    partial class AddCascadeBetweenBinhluanVaNguoiDung
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,21 +51,21 @@ namespace WebTimTro.Data.Migrations
                         new
                         {
                             Id = "admin",
-                            ConcurrencyStamp = "80c7e015-6b61-45dc-99b2-f78ab0d6ce36",
+                            ConcurrencyStamp = "5407d5ac-fbdb-4b51-bdba-0a4ce4e36402",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "nguoidung",
-                            ConcurrencyStamp = "fe122e61-441d-4942-b394-9266c74f88ea",
+                            ConcurrencyStamp = "2c86314f-b1ed-4369-8b01-1b0bc52e83cb",
                             Name = "Nguoidung",
                             NormalizedName = "NGUOIDUNG"
                         },
                         new
                         {
                             Id = "chutro",
-                            ConcurrencyStamp = "07f0e0e3-81c5-4ca3-8992-79d37d38b399",
+                            ConcurrencyStamp = "542faae2-3101-4fb0-8972-391daa892a19",
                             Name = "Chutro",
                             NormalizedName = "CHUTRO"
                         });
