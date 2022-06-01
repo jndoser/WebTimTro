@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -38,6 +39,23 @@ namespace WebTimTro
             services.AddDefaultIdentity<NguoiDung>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie(options =>
+            {
+                options.LoginPath = "/account/google-login";
+                options.LoginPath = "/acount/facebook-login";
+            }).AddGoogle(options =>
+            {
+                options.ClientId = Configuration["Auth:Google:ClientId"];
+                options.ClientSecret = Configuration["Auth:Google:ClientSecret"];
+            }).AddFacebook(options =>
+            {
+                options.AppId = Configuration["Auth:Facebook:AppId"];
+                options.AppSecret = Configuration["Auth:Facebook:AppSecret"];
+            }); ;
 
             // Register unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
