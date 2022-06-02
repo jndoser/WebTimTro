@@ -12,11 +12,6 @@ namespace WebTimTro.Controllers
     [AllowAnonymous, Route("account")]
     public class AccountController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         [Route("google-login")]
         public IActionResult GoogleLogin()
         {
@@ -30,8 +25,8 @@ namespace WebTimTro.Controllers
         [Route("google-response")]
         public async Task<IActionResult> GoogleResponse()
         {
-            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults
-                .AuthenticationScheme);
+            var result = await HttpContext.AuthenticateAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
             var claims = result.Principal.Identities
                 .FirstOrDefault().Claims.Select(claim =>
                 new
@@ -58,8 +53,7 @@ namespace WebTimTro.Controllers
         [Route("facebook-response")]
         public async Task<IActionResult> FacebookResponse()
         {
-            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults
-                .AuthenticationScheme);
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var claims = result.Principal.Identities
                 .FirstOrDefault().Claims.Select(claim => new
                 {

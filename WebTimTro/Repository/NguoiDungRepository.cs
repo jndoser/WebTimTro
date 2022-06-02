@@ -112,8 +112,9 @@ namespace WebTimTro.Repository
             var userIds = _context.UserRoles
                 .Where(x => x.RoleId.Equals("nguoidung"))
                 .Select(x => x.UserId);
+            //var userIds = _context.NguoiDungs.Select(x => x.Id);
 
-            foreach(var id in userIds)
+            foreach (var id in userIds)
             {
                 var nguoiDung = _context.NguoiDungs
                     .FirstOrDefault(x => x.Id.Equals(id));

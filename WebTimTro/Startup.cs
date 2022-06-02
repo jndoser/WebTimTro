@@ -31,6 +31,26 @@ namespace WebTimTro
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie(options =>
+            {
+                options.LoginPath = "/account/google-login";
+                options.LoginPath = "/acount/facebook-login";
+
+            }).AddGoogle(options =>
+            {
+                options.ClientId = Configuration["Auth:Google:ClientId"];
+                options.ClientSecret = Configuration["Auth:Google:ClientSecret"];
+                
+            })
+            .AddFacebook(options =>
+            {
+                options.AppId = Configuration["Auth:Facebook:AppId"];
+                options.AppSecret = Configuration["Auth:Facebook:AppSecret"];
+            });
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -39,23 +59,6 @@ namespace WebTimTro
             services.AddDefaultIdentity<NguoiDung>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie(options =>
-            {
-                options.LoginPath = "/account/google-login";
-                options.LoginPath = "/acount/facebook-login";
-            }).AddGoogle(options =>
-            {
-                options.ClientId = Configuration["Auth:Google:ClientId"];
-                options.ClientSecret = Configuration["Auth:Google:ClientSecret"];
-            }).AddFacebook(options =>
-            {
-                options.AppId = Configuration["Auth:Facebook:AppId"];
-                options.AppSecret = Configuration["Auth:Facebook:AppSecret"];
-            }); ;
 
             // Register unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
