@@ -1,10 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>aspnet-WebTimTro-85209548-161C-4F27-B0F9-843BF4D56510</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
@@ -18,14 +16,14 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.ML" Version="1.6.0" />
+    <PackageReference Include="Microsoft.ML.Recommender" Version="0.18.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>F:\test-code\payment-master\c#\MoMo\lib\log4net.dll</HintPath>
@@ -34,5 +32,19 @@
       <HintPath>F:\test-code\payment-master\c#\MoMo\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
-
+  <ItemGroup Label="RecommendingMLModel">
+    <None Include="RecommendingMLModel.consumption.cs">
+      <DependentUpon>RecommendingMLModel.mbconfig</DependentUpon>
+    </None>
+    <None Include="RecommendingMLModel.training.cs">
+      <DependentUpon>RecommendingMLModel.mbconfig</DependentUpon>
+    </None>
+    <None Include="RecommendingMLModel.zip">
+      <DependentUpon>RecommendingMLModel.mbconfig</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RecommendingMLModel_ConsoleApp\RecommendingMLModel_ConsoleApp.csproj" />
+  </ItemGroup>
 </Project>

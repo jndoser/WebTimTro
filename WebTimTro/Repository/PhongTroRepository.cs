@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WebTimTro.Data;
 using WebTimTro.Interfaces;
+using WebTimTro.Models;
 
 namespace WebTimTro.Repository
 {
@@ -63,6 +64,28 @@ namespace WebTimTro.Repository
                 result.Add(id);
             }
             return result;
+        }
+
+        // Lấy ra id của tất cả các phòng trọ
+        public List<int> GetPhongTroIds()
+        {
+            List<int> phongTroIds = _context
+                .PhongTros.Select(x => x.Id).ToList();
+            return phongTroIds;
+        }
+
+        // Lấy ra phòng trọ khi cho trước danh sách id
+        public List<PhongTro> GetPhongTroByIds(List<int> ids)
+        {
+            List<PhongTro> phongTros = new List<PhongTro>();
+            foreach(int item in ids)
+            {
+                PhongTro phongTro = _context
+                    .PhongTros.FirstOrDefault(x => x.Id == item);
+                phongTros.Add(phongTro);
+            }
+
+            return phongTros;
         }
     }
 }

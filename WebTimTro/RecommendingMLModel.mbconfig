@@ -1,0 +1,144 @@
+﻿{
+  "TrainingTime": 90,
+  "Scenario": "Recommendation",
+  "DataSource": {
+    "Type": "SQL",
+    "Version": 1,
+    "ColumnProperties": [
+      {
+        "ColumnName": "NguoiDungId",
+        "ColumnPurpose": "User",
+        "ColumnDataFormat": "String",
+        "IsCategorical": false,
+        "Type": "Column",
+        "Version": 1
+      },
+      {
+        "ColumnName": "PhongTroId",
+        "ColumnPurpose": "Item",
+        "ColumnDataFormat": "Single",
+        "IsCategorical": false,
+        "Type": "Column",
+        "Version": 1
+      },
+      {
+        "ColumnName": "Rating",
+        "ColumnPurpose": "Label",
+        "ColumnDataFormat": "Single",
+        "IsCategorical": false,
+        "Type": "Column",
+        "Version": 1
+      }
+    ],
+    "ConnectionString": "Data Source=DESKTOP-TE08QLI\\LONG;Initial Catalog=WebTimTro;Integrated Security=True",
+    "CommandString": "SELECT NguoiDungId, CAST(PhongTroId as REAL), CAST(Rating as REAL) FROM [dbo].[PhongTroDanhGias]",
+    "DatabaseName": "WebTimTro",
+    "SelectedTableDbo": "dbo",
+    "TableName": "PhongTroDanhGias"
+  },
+  "Environment": {
+    "Type": "LocalCPU",
+    "Version": 1
+  },
+  "RunHistory": {
+    "Version": 0,
+    "Type": "Result",
+    "Trials": [
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -1.5154,
+        "RuntimeInSeconds": 3.6
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -37.95,
+        "RuntimeInSeconds": 1.5
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -57.7865,
+        "RuntimeInSeconds": 1.0
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -45.8007,
+        "RuntimeInSeconds": 2.8
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -58.0012,
+        "RuntimeInSeconds": 0.9
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -40.89,
+        "RuntimeInSeconds": 2.3
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -55.1853,
+        "RuntimeInSeconds": 7.6
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -45.9551,
+        "RuntimeInSeconds": 1.8
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -58.7828,
+        "RuntimeInSeconds": 1.4
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -40.3507,
+        "RuntimeInSeconds": 3.3
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -1.4402,
+        "RuntimeInSeconds": 1.2
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -47.6591,
+        "RuntimeInSeconds": 2.5
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -63.2792,
+        "RuntimeInSeconds": 50.6
+      }
+    ],
+    "Pipeline": "[{\"EstimatorType\":\"MapValueToKey\",\"Inputs\":[\"NguoiDungId\"],\"Outputs\":[\"NguoiDungId\"]},{\"EstimatorType\":\"MapValueToKey\",\"Inputs\":[\"PhongTroId\"],\"Outputs\":[\"PhongTroId\"]},{\"LabelColumnName\":\"Rating\",\"MatrixColumnIndexColumnName\":\"NguoiDungId\",\"MatrixRowIndexColumnName\":\"PhongTroId\",\"ApproximationRank\":\"64\",\"LearningRate\":\"0.1\",\"NumberOfIterations\":\"10\",\"EstimatorType\":\"MatrixFactorization\",\"Inputs\":[\"Features\"],\"Outputs\":[\"Score\"]}]",
+    "MetricName": "RSquared"
+  },
+  "Type": "TrainingConfig",
+  "Version": 1
+}
