@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "RecommendingSystemMLModel_WebApi": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:56759;http://localhost:56760"
+    }
+  }
+}

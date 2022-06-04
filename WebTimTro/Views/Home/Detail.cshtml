@@ -11,6 +11,7 @@
     List<string> hinhAnhFileNames = ViewBag.HinhAnhFileNames;
     string note = ViewBag.Note;
     List<DichVuVM> dichVusVM = ViewBag.DichVuCuaPhongTro;
+    List<PhongTroVM> phongTroGoiY = ViewBag.PhongTroGoiY;
 }
 
 <input hidden id="loginStatus" value="@(SignInManager.IsSignedIn(User) ? 1 : 0)" />
@@ -149,6 +150,38 @@
                         <!--Nơi viết comment-->
                         @if (SignInManager.IsSignedIn(User))
                         {
+                            <div>Đánh giá phòng trọ này</div>
+                            <div class="row">
+                                <div class="btn-group col-10" role="group" aria-label="Basic radio toggle button group" style="margin-bottom: 5px;">
+
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (_unitOfWork.PhongTroDanhGia.GetPhongTroDanhGiaByNguoiDungIdPhongTroId(_unitOfWork.NguoiDung.GetUserId(), Model.Id) == null)
+                                        {
+                                            <input type="radio" value="@(i)" class="btn-check" name="btnradio" id="btnradio@(i)" autocomplete="off">
+                                            <label class="btn btn-outline-primary" for="btnradio@(i)">@(i)</label>
+                                        }
+                                        else
+                                        {
+                                            if (_unitOfWork.PhongTroDanhGia.GetPhongTroRatingByNguoiDungIdPhongTroId(_unitOfWork.NguoiDung.GetUserId(), Model.Id) == i)
+                                            {
+                                                <input type="radio" value="@(i)" class="btn-check" name="btnradio" id="btnradio@(i)" checked="" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="btnradio@(i)">@(i)</label>
+                                            }
+                                            else
+                                            {
+                                                <input type="radio" value="@(i)" class="btn-check" name="btnradio" id="btnradio@(i)" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="btnradio@(i)">@(i)</label>
+                                            }
+                                        }
+
+
+                                    }
+                                </div>
+                                <button type="button" onclick="DanhGiaPhongTro()" class="btn rounded-pill btn-primary col-4" style="margin-left: 180px;">
+                                    <span class="tf-icons bx bx-star"></span>&nbsp; Đánh giá
+                                </button>
+                            </div>
                             <form method="post">
                                 <div class="bg-light p-2">
                                     <div class="d-flex flex-row align-items-start">
@@ -165,7 +198,7 @@
                         }
                         else
                         {
-                            <div>Bạn hãy đăng nhập để bình luận vào bài viết</div>
+                            <div>Bạn hãy đăng nhập để bình luận và đánh giá vào bài viết</div>
                         }
 
                         <div id="listComment">
@@ -175,6 +208,34 @@
             </div>
 
 
+        </div>
+    </div>
+
+    <div class="card mb-4 col-4">
+        <div class="container mt-5">
+            <div class="d-flex justify-content-center row">
+                <div class="col-lg-12">
+                    <small class="text-light fw-semibold">Có thể bạn sẽ thích </small>
+                    <div class="demo-inline-spacing mt-3">
+                        <div class="list-group">
+                            @for(int i = 0; i < 5; i++)
+                           {
+                               <a href="/Home/Detail/@(phongTroGoiY[i].Id)" class="list-group-item list-group-item-action flex-column align-items-start">
+                                <div class="d-flex justify-content-between w-100">
+                                    <h6>@(phongTroGoiY[i].Ten)</h6>
+                                    <small></small>
+                                </div>
+                                <p class="mb-1">
+                                   
+                                </p>
+                                <small>@(phongTroGoiY[i].Gia)</small>
+                            </a>   
+                           }
+                                                    
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -963,5 +1024,24 @@
         } else {
             $('#bookingStatusModalFalse').modal('show');
         }
+    }
+
+    function DanhGiaPhongTro() {
+        var btnradio = $("input:radio[name='btnradio']:checked").val();
+        console.log('danh gia phong tro: ' + btnradio);
+
+        $.ajax({
+            url: '/Home/DanhGiaPhongTro',
+            method: 'post',
+            data: { phongTroId: @Model.Id, rating: btnradio },
+            success: function(result) {
+                if (result.status == "ok") {
+                    console.log('rating thanh cong');
+                }
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
     }
 </script>

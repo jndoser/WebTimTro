@@ -30,5 +30,8 @@ namespace WebTimTro.Data
 
         // 1 người dùng chỉ có thể đặt được nhiều phòng trọ
         public ICollection<PhongTroBooking> PhongTroBookings { get; set; }
+
+        // 1 người dùng có thể đánh giá nhiều phòng trọ
+        public ICollection<PhongTroDanhGia> PhongTroDanhGias { get; set; }
     }
 }

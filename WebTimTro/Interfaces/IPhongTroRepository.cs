@@ -16,5 +16,11 @@ namespace WebTimTro.Interfaces
 
         // Lấy ra id các phòng trọ thuộc địa điểm được truyền vào
         public List<int> GetPhongTroIdsThuocDiaDiem(string diaDiem);
+
+        // Lấy ra id của tất cả các phòng trọ
+        public List<int> GetPhongTroIds();
+
+        // Lấy ra phòng trọ khi cho trước danh sách id
+        public List<PhongTro> GetPhongTroByIds(List<int> ids);
     }
 }

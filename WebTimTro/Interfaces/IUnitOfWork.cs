@@ -14,6 +14,7 @@
         IPhongTroLuuTruRepository PhongTroLuuTru { get; }
         IPhongTroQuanTamRepository PhongTroQuanTam { get; }
         IPhongTroBookingRepository PhongTroBooking { get; }
+        IPhongTroDanhGiaRepository PhongTroDanhGia { get; }
 
         bool Save();
         void Dispose();

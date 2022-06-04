@@ -165,6 +165,43 @@ namespace WebTimTro.Controllers
                 .Map<List<DichVu>, List<DichVuVM>>(dichVus);
             ViewBag.DichVuCuaPhongTro = dichVusVM;
 
+
+            // Xử lý phần gợi ý phòng trọ
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+            List<int> phongTroIds = _unitOfWork.PhongTro.GetPhongTroIds();
+            List<PhongTro> phongTros = new List<PhongTro>();
+            Dictionary<int, float> predictScores = new Dictionary<int, float>();
+            List<int> phongTroIdAfterRating = new List<int>();
+            //List<float> scores = new List<float>();
+
+            // Bắt đầu predict người dùng sẽ rating phòng trọ với mức độ ntn
+            foreach (int item in phongTroIds)
+            {
+                RecommendingMLModel.ModelInput sampleData = new RecommendingMLModel.ModelInput()
+                {
+                    NguoiDungId = nguoiDungId,
+                    PhongTroId = item,
+                };
+
+                var predictionResult = RecommendingMLModel.Predict(sampleData);
+
+                // Add điểm rating với id của phòng trọ tương ứng
+                predictScores.Add(item, predictionResult.Score);
+               // scores.Add(predictionResult.Score);
+            }
+
+            // Sắp xếp điểm theo thứ tự giảm dần và gán vào mảng chứa id của phòng trọ
+            foreach (KeyValuePair<int, float> item in predictScores.OrderByDescending(key => key.Value))
+            {
+                phongTroIdAfterRating.Add(item.Key);
+            }
+
+            List<PhongTro> data = _unitOfWork
+                .PhongTro.GetPhongTroByIds(phongTroIdAfterRating);
+
+            List<PhongTroVM> phongTroGoiY = _mapper.Map<List<PhongTroVM>>(data);
+            ViewBag.PhongTroGoiY = phongTroGoiY;
+
             return View(phongTroVM);
         }
 
@@ -1055,6 +1092,49 @@ namespace WebTimTro.Controllers
                 _unitOfWork.NguoiDung.Update(newNguoiDung);
 
 
+                if (_unitOfWork.Save())
+                {
+                    return Json(new { status = "ok" });
+                }
+                else
+                {
+                    return Json(new { status = "err" });
+                }
+            }
+        }
+
+        public JsonResult DanhGiaPhongTro(int phongTroId, int rating)
+        {
+            string nguoiDungId = _unitOfWork.NguoiDung.GetUserId();
+
+            PhongTroDanhGia existPhongTroDanhGia = _unitOfWork.PhongTroDanhGia
+                    .GetPhongTroDanhGiaByNguoiDungIdPhongTroId(nguoiDungId, phongTroId);
+
+            if (existPhongTroDanhGia != null)
+            {
+                PhongTroDanhGia newPhongTroDanhGia = existPhongTroDanhGia;
+                newPhongTroDanhGia.Rating = rating;
+
+                _unitOfWork.PhongTroDanhGia.Update(newPhongTroDanhGia);
+                if (_unitOfWork.Save())
+                {
+                    return Json(new { status = "ok" });
+                }
+                else
+                {
+                    return Json(new { status = "err" });
+                }
+            } else
+            {
+                PhongTroDanhGia phongTroDanhGia = new PhongTroDanhGia
+                {
+                    NguoiDungId = nguoiDungId,
+                    PhongTroId = phongTroId,
+                    Rating = rating
+                };
+
+
+                _unitOfWork.PhongTroDanhGia.Create(phongTroDanhGia);
                 if (_unitOfWork.Save())
                 {
                     return Json(new { status = "ok" });
