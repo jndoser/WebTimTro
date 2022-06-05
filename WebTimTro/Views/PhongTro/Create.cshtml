@@ -1,6 +1,23 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@using WebTimTro.Data
+@inject SignInManager<NguoiDung> SignInManager
+@inject UserManager<NguoiDung> UserManager
+
+@{
     ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    //Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    if (SignInManager.IsSignedIn(User))
+    {
+        if (User.IsInRole("Chutro"))
+        {
+            Layout = "~/Views/Shared/_Layout.cshtml";
+        } else
+        {
+            Layout = "~/Views/Shared/_AdminLayout.cshtml";
+        }
+    }
+
     List<DichVuVM> allDichVuVM = ViewBag.TatCaDichVu;
 }
 

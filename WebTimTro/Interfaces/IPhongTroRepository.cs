@@ -22,5 +22,10 @@ namespace WebTimTro.Interfaces
 
         // Lấy ra phòng trọ khi cho trước danh sách id
         public List<PhongTro> GetPhongTroByIds(List<int> ids);
+
+        public string GetCurrentTabIndex();
+
+        // Reset lại tab để không có tab nào đang được chọn
+        public void ResetCurrentTab();
     }
 }

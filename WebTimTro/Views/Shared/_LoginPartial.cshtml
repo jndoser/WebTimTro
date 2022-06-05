@@ -7,7 +7,7 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Manage") ? "active" : "")">
+    <li class="menu-item @(_unitOfWork.PhongTro.GetCurrentTabIndex().Equals("CaiDatNguoiDung") ? "active" : "")">
         <a class="menu-link" asp-controller="Home" asp-action="EditUserProfile" asp-route-id="@(_unitOfWork.NguoiDung.GetUserId())">
             <i class="menu-icon tf-icons bx bxs-user-circle"></i>
             <div data-i18n="Boxicons">Hello @User.Identity.Name!</div>

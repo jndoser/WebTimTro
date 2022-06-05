@@ -212,7 +212,7 @@
     </div>
 
     <div class="card mb-4 col-4">
-        <div class="container mt-5">
+        <div class="container mb-4 mt-5">
             <div class="d-flex justify-content-center row">
                 <div class="col-lg-12">
                     <small class="text-light fw-semibold">Có thể bạn sẽ thích </small>
@@ -223,12 +223,12 @@
                                <a href="/Home/Detail/@(phongTroGoiY[i].Id)" class="list-group-item list-group-item-action flex-column align-items-start">
                                 <div class="d-flex justify-content-between w-100">
                                     <h6>@(phongTroGoiY[i].Ten)</h6>
-                                    <small></small>
+                                    <small>@(phongTroGoiY[i].SucChua) người ở</small>
                                 </div>
                                 <p class="mb-1">
                                    
                                 </p>
-                                <small>@(phongTroGoiY[i].Gia)</small>
+                                <small>Giá trọ: @(String.Format("{0:n0}", phongTroGoiY[i].Gia)) VND</small>
                             </a>   
                            }
                                                     

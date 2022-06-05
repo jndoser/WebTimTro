@@ -7,6 +7,7 @@ using System.Linq;
 using WebTimTro.Data;
 using WebTimTro.Interfaces;
 using WebTimTro.Models;
+using WebTimTro.StaticData;
 
 namespace WebTimTro.Controllers
 {
@@ -24,6 +25,7 @@ namespace WebTimTro.Controllers
 
         public IActionResult Index()
         {
+            TabIndex.Value = "PhongTroDatCoc";
             return View();
         }
 

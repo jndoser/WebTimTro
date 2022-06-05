@@ -1,8 +1,25 @@
 ﻿@model WebTimTro.Models.PhongTroVM
 
+@using Microsoft.AspNetCore.Identity
+@using WebTimTro.Data
+@inject SignInManager<NguoiDung> SignInManager
+@inject UserManager<NguoiDung> UserManager
+
 @{
     ViewData["Title"] = "Edit";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    //Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    if (SignInManager.IsSignedIn(User))
+    {
+        if (User.IsInRole("Chutro"))
+        {
+            Layout = "~/Views/Shared/_Layout.cshtml";
+        } else
+        {
+            Layout = "~/Views/Shared/_AdminLayout.cshtml";
+        }
+    }
+
     string ngayHetHan = Model.NgayHetHan.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss");
     string ngayDang = Model.NgayDang.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss");
     NoteVM ghiChu = ViewBag.GhiChu;

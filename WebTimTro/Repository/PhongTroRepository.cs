@@ -4,6 +4,7 @@ using System.Linq;
 using WebTimTro.Data;
 using WebTimTro.Interfaces;
 using WebTimTro.Models;
+using WebTimTro.StaticData;
 
 namespace WebTimTro.Repository
 {
@@ -86,6 +87,18 @@ namespace WebTimTro.Repository
             }
 
             return phongTros;
+        }
+
+        // Lấy ra index hiện tại của tab
+        public string GetCurrentTabIndex()
+        {
+            return TabIndex.Value;
+        }
+
+        // Reset lại tab để không có tab nào đang được chọn
+        public void ResetCurrentTab()
+        {
+            TabIndex.Value = "";
         }
     }
 }

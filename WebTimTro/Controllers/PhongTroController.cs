@@ -14,8 +14,7 @@ using WebTimTro.Data;
 using WebTimTro.Helpers;
 using WebTimTro.Interfaces;
 using WebTimTro.Models;
-
-
+using WebTimTro.StaticData;
 
 namespace WebTimTro.Controllers
 {
@@ -43,12 +42,14 @@ namespace WebTimTro.Controllers
         [Authorize(Roles = "Administrator, Chutro")]
         public IActionResult Index()
         {
+            TabIndex.Value = "PhongTroCuaToi";
+
             return View();
         }
 
         [Authorize(Roles = "Administrator, Chutro")]
         public IActionResult Create()
-        {
+        { 
             // Tìm tất cả các dịch vụ có trong dữ liệu
             List<DichVu> allDichVu = _unitOfWork
                 .DichVu.GetAll().ToList();
@@ -466,6 +467,7 @@ namespace WebTimTro.Controllers
         // Hiển thị các phòng trọ đã lưu
         public IActionResult Saved()
         {
+            TabIndex.Value = "PhongTroDaLuu";
             return View();
         }
 

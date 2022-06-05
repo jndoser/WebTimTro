@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using WebTimTro.Interfaces;
 using WebTimTro.Models;
+using WebTimTro.StaticData;
 
 namespace WebTimTro.Controllers
 {
@@ -23,6 +24,7 @@ namespace WebTimTro.Controllers
 
         public IActionResult Index()
         {
+            TabIndex.Value = "TimKiemNangCao";
             return View();
         }
 

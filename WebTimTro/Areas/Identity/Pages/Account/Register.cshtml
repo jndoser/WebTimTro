@@ -1,7 +1,10 @@
 ﻿@page
 @model RegisterModel
+@inject WebTimTro.Interfaces.IUnitOfWork _unitOfWork;
+
 @{
     ViewData["Title"] = "Register";
+    _unitOfWork.PhongTro.ResetCurrentTab();
 }
 
 <div class="card" style="margin-left: 20px; margin-right: 20px; margin-top: 30px; padding:15px;">

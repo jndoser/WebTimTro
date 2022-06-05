@@ -14,6 +14,7 @@ using WebTimTro.Data;
 using WebTimTro.Interfaces;
 using WebTimTro.Models;
 using WebTimTro.Services.MoMo;
+using WebTimTro.StaticData;
 
 namespace WebTimTro.Controllers
 {
@@ -40,6 +41,7 @@ namespace WebTimTro.Controllers
 
         public IActionResult Index()
         {
+            TabIndex.Value = "KhamPha";
             return View();
         }
 
@@ -977,6 +979,8 @@ namespace WebTimTro.Controllers
 
         public IActionResult EditUserProfile(string id)
         {
+            TabIndex.Value = "CaiDatNguoiDung";
+
             var user = _unitOfWork.NguoiDung.GetUserById(id);
             var userModel = _mapper.Map<NguoiDung, NguoiDungVM>(user);
 
