@@ -71,5 +71,22 @@ namespace WebTimTro.Repository
                 return false;
             }
         }
+
+        // Lấy ra tất cả các phòng trọ đã được đặt bởi người dùng
+        public List<PhongTro> GetPhongTrosByNguoiDungId(string nguoiDungId)
+        {
+            var phongTroIds = _context.PhongTroBookings
+                .Where(x => x.NguoiDungId.Equals(nguoiDungId))
+                .Select(x => x.PhongTroId);
+
+            List<PhongTro> phongTros = new List<PhongTro>();
+            foreach(var id in phongTroIds)
+            {
+                PhongTro phongTro = _context
+                    .PhongTros.FirstOrDefault(x => x.Id == id);
+                phongTros.Add(phongTro);
+            }
+            return phongTros;
+        }
     }
 }

@@ -12,5 +12,8 @@ namespace WebTimTro.Interfaces
         public List<NguoiDung> GetNguoiDatCocByPhongTroId(int phongTroId);
         public bool IsAdreadyBooking(string nguoiDungId);
         public bool IsQuaHanDatPhong(int phongTroId);
+
+        // Lấy ra tất cả các phòng trọ đã được đặt bởi người dùng
+        public List<PhongTro> GetPhongTrosByNguoiDungId(string nguoiDungId);
     }
 }

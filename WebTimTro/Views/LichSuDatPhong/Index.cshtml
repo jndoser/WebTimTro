@@ -1,11 +1,18 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@using WebTimTro.Data
+@inject SignInManager<NguoiDung> SignInManager
+@inject UserManager<NguoiDung> UserManager
+
+
+@{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<input hidden id="loginStatus" value="@(SignInManager.IsSignedIn(User) ? 1 : 0)" />
 <div class="card" style="margin-left: 50px; margin-right: 50px; margin-top: 30px;">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Danh sách đặt cọc của các phòng trọ</h5>
+        <h5 class="mb-0">Lịch sử đặt trọ của bạn</h5>
     </div>
     <div class="input-group" style="width:600px; margin:20px;">
         <input type="text" class="form-control txtSearch" placeholder="Nhập vào thông tin phòng trọ bạn muốn tìm kiếm" aria-label="Ten chu tro" aria-describedby="search">
@@ -18,10 +25,10 @@
                 <tr>
                     <th>Tên</th>
                     <th>Địa Chỉ</th>
-                    <th>Số người đặt cọc</th>
+                    <th>Số người ở</th>
                     <th>Giá</th>
-                    <th>Ngày Đăng</th>
-                    <th>Ngày Hết Hạn</th>
+                    <th>Ngày đặt cọc</th>
+                    <th>Số tiền cọc</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -31,10 +38,10 @@
                 <tr>
                     <th>Tên</th>
                     <th>Địa Chỉ</th>
-                    <th>Số người đặt cọc</th>
+                    <th>Số người ở</th>
                     <th>Giá</th>
-                    <th>Ngày Đăng</th>
-                    <th>Ngày Hết Hạn</th>
+                    <th>Ngày đặt cọc</th>
+                    <th>Số tiền cọc</th>
                     <th>Action</th>
                 </tr>
             </tfoot>
@@ -51,12 +58,33 @@
     </div>
 </div>
 
-<script>
+<!--Modal hiển thị để thông báo cho người dùng-->
+<div class="modal fade show" id="messageModal" aria-labelledby="modalToggleLabel" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalToggleLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Bạn hãy đăng nhập để xem lịch sử đặt phòng</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    $(function() {
+<script>
+$(function() {
+        var loginStatus = $('#loginStatus').val();
+            if (loginStatus == 0) {
+                $('#messageModal').modal('show');
+            }
         function load(txtSearch, page) {
             $.ajax({
-                url: '/PhongTroDatCoc/GetAll',
+                url: '/LichSuDatPhong/GetAll',
                 method: 'get',
                 data: { txtSearch: txtSearch, page: page },
                 success: function(result) {
@@ -64,34 +92,28 @@
                         var str = '';
                         $.each(result.phongTros, function(index, value) {
                             // Formatted Ngay dang bai
-                            var ngayDang = new Date(value.ngayDang);
+                            var ngayDang = new Date(result.ngayDatCocs[index]);
                             var NgayDang_str = ((ngayDang.getMonth() > 8) ? (ngayDang.getMonth() + 1) :
                                 ('0' + (ngayDang.getMonth() + 1))) + '/' + ((ngayDang.getDate() > 9)
                                     ? ngayDang.getDate() : ('0' + ngayDang.getDate()))
                                 + '/' + ngayDang.getFullYear();
 
-                            // Formatted Ngay het han cho dat tro
-                            var ngayHetHan = new Date(value.ngayHetHan);
-                            var ngayHetHan_str = ((ngayHetHan.getMonth() > 8) ? (ngayHetHan.getMonth() + 1) :
-                                ('0' + (ngayHetHan.getMonth() + 1))) + '/' + ((ngayHetHan.getDate() > 9)
-                                    ? ngayHetHan.getDate() : ('0' + ngayHetHan.getDate()))
-                                + '/' + ngayHetHan.getFullYear();
 
                             // Create list post
                             str += '<tr id="row' + value.id + '">';
                             str += "<td>" + (value.ten) + "</td>";
                             str += "<td>" + value.diaChi + "</td>";
-                            str += "<td>" + result.datCocs[index] + '/' + value.sucChua + "</td>";
+                            str += "<td>" + value.sucChua + "</td>";
                             str += "<td>" + formatCurrency(value.gia) + "</td>";
                             str += "<td>" + NgayDang_str + "</td>";
-                            str += "<td>" + ngayHetHan_str + "</td>";
+                            str += "<td>" + formatCurrency(result.tienCocs[index]) + "</td>";
                             str += "<td>";
                             str += '<div class="dropdown">';
                             str += '<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">';
                             str += '<i class="bx bx-dots-vertical-rounded"></i>';
                             str += '</button>';
                             str += '<div class="dropdown-menu">';
-                            str += '<a class="dropdown-item" href="/PhongTroDatCoc/ViewNguoiDat/' + value.id + '"><i class="bx bx-show-alt me-1"></i> Xem ai đã đặt cọc</a>';
+                            str += '<a class="dropdown-item" href="/Home/Detail/'+ value.id +'"><i class="bx bx-show-alt me-1"></i> Xem phòng trọ</a>';
                             str += '</div>';
                             str += '</div>';
                             str += '</td>';
@@ -171,7 +193,7 @@
         load(null, 1);
     });
 
-    function formatCurrency(numb) {
+function formatCurrency(numb) {
         var str = numb.toString().split(".");
         str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return str.join(".");

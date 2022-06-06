@@ -156,6 +156,14 @@
                 <div data-i18n="Basic">Lưu trữ</div>
               </a>
             </li>
+
+            <!-- Cards -->
+            <li class="menu-item @(_unitOfWork.PhongTro.GetCurrentTabIndex().Equals("LichSuDatPhong") ? "active" : "") ">
+              <a asp-controller="LichSuDatPhong" asp-action="Index" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-time-five"></i>
+                <div data-i18n="Basic">Lịch sử đặt phòng</div>
+              </a>
+            </li>
            
 
             <li class="menu-item @(_unitOfWork.PhongTro.GetCurrentTabIndex().Equals("TimKiemNangCao") ? "active" : "")">
