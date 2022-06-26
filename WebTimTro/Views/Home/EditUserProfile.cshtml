@@ -84,18 +84,18 @@
         <!-- /Account -->
     </div>
     <div class="card mb-4">
-        <h5 class="card-header">Delete Account</h5>
+        <h5 class="card-header">Xoá tài khoản</h5>
         <div class="card-body">
             <div class="mb-3 col-12 mb-0">
                 <div class="alert alert-warning">
-                    <h6 class="alert-heading fw-bold mb-1">Are you sure you want to delete your account?</h6>
-                    <p class="mb-0">Once you delete your account, there is no going back. Please be certain.</p>
+                    <h6 class="alert-heading fw-bold mb-1">Bạn có chắc chắn là muốn xoá tài khoản của mình không?</h6>
+                    <p class="mb-0">Khi bạn xoá tài khoản, bạn sẽ không thể khôi phục lại được.</p>
                 </div>
             </div>
             <form>
                 <div class="form-check mb-3">
                     <input class="form-check-input" asp-for="Id" hidden>
-                    <label class="form-check-label" for="accountActivation">I confirm my account deactivation</label>
+                    <label class="form-check-label" for="accountActivation">Tôi xác nhận xoá tài khoản</label>
                 </div>
                 <button type="button" onclick="ConfirmDeleteNguoiDung()" class="btn btn-danger deactivate-account">Deactivate Account</button>
             </form>

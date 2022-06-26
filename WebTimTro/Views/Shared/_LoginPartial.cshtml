@@ -10,12 +10,12 @@
     <li class="menu-item @(_unitOfWork.PhongTro.GetCurrentTabIndex().Equals("CaiDatNguoiDung") ? "active" : "")">
         <a class="menu-link" asp-controller="Home" asp-action="EditUserProfile" asp-route-id="@(_unitOfWork.NguoiDung.GetUserId())">
             <i class="menu-icon tf-icons bx bxs-user-circle"></i>
-            <div data-i18n="Boxicons">Hello @User.Identity.Name!</div>
+            <div data-i18n="Boxicons">Xin chào @User.Identity.Name!</div>
         </a>
     </li>
     <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Logout") ? "active" : "")" style="margin-left:30px;">
         <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button id="logoutButton" type="submit" class="nav-link btn btn-link text-dark">  Logout</button>
+            <button id="logoutButton" type="submit" class="nav-link btn btn-link text-dark">  Đăng xuất</button>
         </form>
     </li>
 }
@@ -24,13 +24,13 @@ else
     <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Register") ? "active" : "")">
         <a asp-area="Identity" asp-page="/Account/Register" class="menu-link">
             <i class="menu-icon tf-icons bx bx-user-plus"></i>
-            <div data-i18n="Boxicons">Register</div>
+            <div data-i18n="Boxicons">Đăng ký</div>
         </a>
     </li>
     <li class="menu-item @(Context.Request.GetDisplayUrl().Contains("Login") ? "active" : "")">
         <a asp-area="Identity" asp-page="/Account/Login" class="menu-link">
             <i class="menu-icon tf-icons bx bxs-face"></i>
-            <div data-i18n="Boxicons">Login</div>
+            <div data-i18n="Boxicons">Đăng nhập</div>
         </a>
     </li>
 }

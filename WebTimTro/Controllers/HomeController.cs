@@ -176,7 +176,7 @@ namespace WebTimTro.Controllers
             List<int> phongTroIdAfterRating = new List<int>();
             //List<float> scores = new List<float>();
 
-            // Bắt đầu predict người dùng sẽ rating phòng trọ với mức độ ntn
+            // Bắt đầu predict người dùng sẽ rating phòng trọ với mức độ như thế nào
             foreach (int item in phongTroIds)
             {
                 RecommendingMLModel.ModelInput sampleData = new RecommendingMLModel.ModelInput()
