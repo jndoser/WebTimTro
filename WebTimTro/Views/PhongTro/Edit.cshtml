@@ -210,16 +210,16 @@
         });
     });
     function DeletePicture(id) {
-        //$.ajax({
-        //    url: '/PhongTro/DeleteHinhAnh',
-        //    method: 'post',
-        //    data: {id: id},
-        //    success: function(result){
-        //        if(result.status == "ok"){
-        //            $('#hinhAnh_' + id).hide();                  
-        //        }
-        //    }
-        //});
+        $.ajax({
+            url: '/PhongTro/DeleteHinhAnh',
+            method: 'post',
+            data: {id: id},
+            success: function(result){
+                if(result.status == "ok"){
+                    $('#hinhAnh_' + id).hide();                  
+                }
+            }
+        });
         $('#hinhAnh_' + id).hide();     
     }
 
